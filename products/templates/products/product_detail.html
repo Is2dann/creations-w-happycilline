@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}{{ product.name }} - Product{% endblock %}
+{% block content %}
+
+<div class="container py-4">
+    <div class="row g-4">
+        <div class="col-md-6">
+            {% if primary_image %}
+                <img class="img-fluid rounded" src="{{ primary_image.image.url }}" alt="{{ primary_image.alt_text|default:product.name }}">
+            {% else %}
+                <div class="bg-light border rounded d-flex align-items-center justify-content-center" style="height: 360px;">
+                    <span class="text-muted">No Image</span>
+                </div>
+            {% endif %}
+
+            {% if gallery %}
+                <div class="d-flex gap-2 mt-2 flex-wrap">
+                    {% for img in gallery %}
+                        <a href="{{ img.image.url }}">
+                            <img class="img-thumbnail" src="{{ img.image.url }}" alt="{{ img.alt_text|default:product.name }}" style="width: 88px;height: 88px;object-fit: cover;">
+                        </a>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="col-md-6">
+            <h1 class="h3">{{ product.name }}</h1>
+            <p class="h4 mb-3">£{{ product.price }}</p>
+            <p>{{ product.description|linebreaks }}</p>
+
+            <!-- Hook into bag app later -->
+            
+
+            {% if product.category %}
+                <p class="mb-0">
+                    <small>Category: 
+                        <a href="{% url 'products:product_list_by_category' product.category.slug %}">
+                            {{ product.category.name }}
+                        </a>
+                    </small>
+                </p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+{% endblock %}
