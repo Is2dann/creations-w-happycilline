@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
+    'profiles.apps.ProfilesConfig'
     
     # Local apps
     'home',
