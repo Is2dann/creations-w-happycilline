@@ -1,0 +1,124 @@
+:root {
+    /* Brand Colours based on the logo */
+    --cwh-charcoal: #4a443b;    /* primary dark background */
+    --cwh-charcoal-2: #2c2822;  /* deeper shadows/borders */
+    --cwh-gold: #d9b47a;        /* accent: buttons, links, highlights */
+    --cwh-ivory: #f9f6f2;       /* light background / surface */
+    --cwh-text: #2b2a28;        /* default text on light */
+
+    --radius: 16px;
+    --shadow: 0 6 px 24px rgba(0,0,0,.18);
+    --transition: all .25s ease;
+}
+
+html, body {
+    height: 100%
+}
+
+body {
+    font-family: 'Lato', system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    color: var(--cwh-ivory);
+    background: radial-gradient(1200px 1200px at 10% 10%, #534c43 0%, var(--cwh-charcoal) 35%, #413c34 100%);
+}
+
+.logo-span {
+    color: var(--cwh-gold) !important;
+}
+
+/* Headings */
+h1, h2, h3, .display-1, .display-2, .display-3 {
+    font-family: 'Playfair Display', serif;
+    letter-spacing: .2px;
+}
+
+/* elegant cursive style from logo, to quotes or hero words */
+.script {
+    font-family: 'Great Vibes', cursive;
+}
+
+/* Navbar */
+.navbar-cwh {
+    background-color: var(--cwh-charcoal) !important;
+    border-bottom: 1px solid rgba(217, 180, 122, .25);
+    backdrop-filter: saturate(120%) blur(6px);
+}
+
+.navbar-cwh .nav-link, .navbar-cwh .navbar-brand {
+    color: var(--cwh-ivory);
+}
+
+.navbar-cwh .nav-link:hover {
+    color: var(--cwh-gold);
+}
+
+btn-cwh {
+    background: var(--cwh-gold);
+    color: #2a231a;
+    border: none;
+    border-radius: var(--radius);
+    padding: .625rem 1rem;
+    box-shadow: var(--shadow);
+    transition: var(--transition);
+}
+
+.btn-cwh:hover {
+    filter: brightness(1.05);
+    transform: translateY(-1px);
+}
+
+.btn-cwh-outline {
+    border: 1px solid var(--cwh-gold);
+    color: var(--cwh-gold);
+    background: transparent;
+    border-radius: var(--radius);
+}
+
+.btn-cwh-outline:hover {
+    background: rgba(217, 180, 122, .12);
+    color: var(--cwh-ivory);
+}
+
+/* Cards */
+.card-cwh {
+    background: rgba(249, 246, 242, .06);
+    border: 1px solid rgba(217, 180, 122, .18);
+    border-radius: var(--radius);
+}
+
+/* Links */
+a {
+    color: var(--cwh-gold);
+    text-decoration: none;
+}
+
+a:hover {
+    opacity: .9;
+}
+
+/* Footer */
+footer {
+    background: var(--cwh-charcoal-2);
+    color: var(--cwh-ivory);
+    border-top: 1ps solid rgba(217, 180, 122, .25);
+}
+
+/* Utils */
+.max-w-3xl {
+    max-width: 64rem;
+}
+
+.shadow-cwh {
+    box-shadow: var(--shadow);
+}
+
+.rounded-2xl {
+    border-radius: var(--radius);
+}
+
+/* Toast location */
+#toastContainer {
+    position: fixed;
+    top: 84px;
+    right: 18px;
+    z-index: 1080;
+}
