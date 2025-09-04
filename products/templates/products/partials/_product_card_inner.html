@@ -1,0 +1,37 @@
+<div class="card card-cwh h-100 shadow-cwh rounded-2xl overflow-hidden">
+  <button type="button" class="p-0 border-0 bg-transparent" data-bs-toggle="modal" data-bs-target="#{{ modal_id }}" aria-label="Open image of {{ alt_text }}">
+    <img src="{{ image_url }}" alt="{{ alt_text }}" class="w-100" style="height: 220px; object-fit: cover;">
+  </button>
+
+  <div class="card-body d-flex flex-column">
+    <h3 class="h6 mb-1 text-truncate">{{ product.name }}</h3>
+    {% if product.category %}
+      <div class="text-muted small mb-2">{{ product.category.name }}</div>
+    {% endif %}
+    <div class="fw-semibold mb-3">£{{ product.price|floatformat:2 }}</div>
+
+    <div class="mt-auto d-flex gap-2">
+      <a href="{% url 'products:detail' slug=product.slug %}" class="btn btn-sm btn-cwh">View</a>
+      <a href="{% url 'products:detail' slug=product.slug %}" class="btn btn-sm btn-cwh-outline">Details</a>
+    </div>
+  </div>
+</div>
+
+{# Per-card modal for a full image preview #}
+<div class="modal fade" id="{{ modal_id }}" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content rounded-2xl" style="background: var(--cwh-charcoal);">
+      <div class="modal-header border-0">
+        <h5 class="modal-title">{{ product.name }}</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body p-0">
+        <img src="{{ image_url }}" alt="{{ alt_text }}" class="w-100" style="max-height: 75vh; object-fit: contain;">
+      </div>
+      <div class="modal-footer border-0">
+        <a href="{% url 'products:detail' slug=product.slug %}" class="btn btn-cwh">Go to product</a>
+        <button type="button" class="btn btn-cwh-outline" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>

@@ -115,10 +115,11 @@ footer {
     border-radius: var(--radius);
 }
 
-/* Toast location */
+/* Toasts */
 #toastContainer {
     position: fixed;
     top: 84px;
-    right: 18px;
+    left: 18px;
     z-index: 1080;
+    color: var(--cwh-text);
 }

@@ -39,8 +39,24 @@ def product_detail(request, slug):
     primary = product.images.filter(
         is_primary=True).first() or product.images.first()
     gallery = list(product.images.all())
+
+    gallery_js = []
+    if primary:
+        gallery_js.append({
+            'url': primary.image.url,
+            'alt': primary.alt_text or product.name,
+        })
+    for img in gallery:
+        if not any(g['url'] == img.image.url for g in gallery_js):
+            gallery_js.append({
+                'url': img.image.url,
+                'alt': img.alt_text or product.name,
+            })
+
+
     return render(request, 'products/product_detail.html', {
         'product': product,
         'primary_image': primary,
         'gallery': gallery,
+        'gallery_js': gallery_js,
     })

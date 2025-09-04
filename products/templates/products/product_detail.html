@@ -1,55 +1,143 @@
 {% extends "base.html" %}
 {% block title %}{{ product.name }} - Product{% endblock %}
+
 {% block content %}
-
 <div class="container py-4">
-    <div class="row g-4">
-        <div class="col-md-6">
-            {% if primary_image %}
-                <img class="img-fluid rounded" src="{{ primary_image.image.url }}" alt="{{ primary_image.alt_text|default:product.name }}">
-            {% else %}
-                <div class="bg-light border rounded d-flex align-items-center justify-content-center" style="height: 360px;">
-                    <span class="text-muted">No Image</span>
-                </div>
-            {% endif %}
-
-            {% if gallery %}
-                <div class="d-flex gap-2 mt-2 flex-wrap">
-                    {% for img in gallery %}
-                        <a href="{{ img.image.url }}">
-                            <img class="img-thumbnail" src="{{ img.image.url }}" alt="{{ img.alt_text|default:product.name }}" style="width: 88px;height: 88px;object-fit: cover;">
-                        </a>
-                    {% endfor %}
-                </div>
-            {% endif %}
+  <div class="row g-4">
+    <div class="col-md-6">
+      {% if primary_image %}
+        <button type="button" class="p-0 border-0 bg-transparent w-100" data-bs-toggle="modal" data-bs-target="#imageModal" data-idx="0" aria-label="Open main image of {{ product.name }}" style="cursor:pointer">
+          <img id="mainImage" class="img-fluid rounded shadow-cwh w-100" src="{{ primary_image.image.url }}" alt="{{ primary_image.alt_text|default:product.name }}" style="max-height: 520px; object-fit: cover;">
+        </button>
+      {% else %}
+        <div class="bg-light border rounded d-flex align-items-center justify-content-center" style="height: 360px;">
+          <span class="text-muted">No Image</span>
         </div>
+      {% endif %}
 
-        <div class="col-md-6">
-            <h1 class="h3">{{ product.name }}</h1>
-            <p class="h4 mb-3">£{{ product.price }}</p>
-            <p>{{ product.description|linebreaks }}</p>
-
-            <!-- Hook into bag app later -->
-            <!-- <form method="POST" action="{% url 'bag:add' %}">
-                {% csrf_token %}
-                <input type="hidden" name="product_slug" value="{{ product.slug }}">
-                <div class="input-group mb-3" style="max-width: 220px;">
-                    <input type="number" class="form-control" name="quantity" min="1" value="1" required>
-                    <button class="btn btn-primary" type="submit">Add to bag</button>
-                </div>
-            </form> -->
-
-            {% if product.category %}
-                <p class="mb-0">
-                    <small>Category: 
-                        <a href="{% url 'products:product_list_by_category' product.category.slug %}">
-                            {{ product.category.name }}
-                        </a>
-                    </small>
-                </p>
-            {% endif %}
+      {% if gallery %}
+        <div class="d-flex gap-2 mt-3 flex-wrap">
+          {% for img in gallery %}
+            <button type="button" class="btn p-0 border-0" data-bs-toggle="modal" data-bs-target="#imageModal" data-idx="{{ forloop.counter0|add:1 }}" aria-label="Open image of {{ img.alt_text|default:product.name }}" style="cursor:pointer">
+              <img class="img-thumbnail rounded" src="{{ img.image.url }}" alt="{{ img.alt_text|default:product.name }}" style="width: 88px; height: 88px; object-fit: cover;" loading="lazy">
+            </button>
+          {% endfor %}
         </div>
+      {% endif %}
     </div>
+
+    <div class="col-md-6">
+      <h1 class="h3">{{ product.name }}</h1>
+      <p class="h4 mb-3">£{{ product.price|floatformat:2 }}</p>
+
+      {% if product.description %}
+        <div class="mb-3">{{ product.description|linebreaks }}</div>
+      {% endif %}
+
+      <!-- This is for bag app later -->
+      <!-- <form method="POST" action="#">
+        {% csrf_token %}
+        <input type="hidden" name="product_slug" value="{{ product.slug }}">
+        <div class="input-group mb-3" style="max-width: 240px;">
+          <input type="number" class="form-control" name="quantity" min="1" value="1" required>
+          <button class="btn btn-cwh" type="submit">Add to bag</button>
+        </div>
+      </form> -->
+
+      {% if product.category %}
+        <p class="mb-0">
+          <small>Category:
+            <a href="{% url 'products:category' slug=product.category.slug %}">
+              {{ product.category.name }}
+            </a>
+          </small>
+        </p>
+      {% endif %}
+    </div>
+  </div>
 </div>
 
+<!-- Full view image modal -->
+<div class="modal fade" id="imageModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-xl">
+    <div class="modal-content rounded-2xl" style="background: var(--cwh-charcoal); position: relative;">
+      <div class="modal-header border-0">
+        <h5 class="modal-title">{{ product.name }}</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+
+      <div class="modal-body p-0 position-relative">
+        <img id="imageModalFull" src="" alt="" class="w-100" style="max-height: 85vh; object-fit: contain;">
+
+        <!-- Prev/Next controls -->
+        <button type="button" id="prevBtn" class="btn btn-cwh-outline position-absolute top-50 start-0 translate-middle-y ms-2" aria-label="Previous image">
+          ←
+        </button>
+        <button type="button" id="nextBtn" class="btn btn-cwh-outline position-absolute top-50 end-0 translate-middle-y me-2" aria-label="Next image">
+          →
+        </button>
+      </div>
+
+      <div class="modal-footer border-0">
+        <div class="small text-muted" id="imageCounter" aria-live="polite"></div>
+        <button type="button" class="btn btn-cwh" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
 {% endblock %}
+
+{% block extra_js %}
+<script>
+  // galleryData comes directly from context as JSON
+  const galleryData = {{ gallery_js|safe }};
+  
+  const modalEl = document.getElementById('imageModal');
+  const modalImg = document.getElementById('imageModalFull');
+  const counter = document.getElementById('imageCounter');
+  const prevBtn = document.getElementById('prevBtn');
+  const nextBtn = document.getElementById('nextBtn');
+  let currentIdx = 0;
+
+  function showImage(idx) {
+    if (!galleryData.length) return;
+    if (idx < 0) idx = galleryData.length - 1;
+    if (idx >= galleryData.length) idx = 0;
+    currentIdx = idx;
+    const item = galleryData[currentIdx];
+    if (modalImg) {
+      modalImg.src = item.url;
+      modalImg.alt = item.alt || "";
+    }
+    if (counter) {
+      counter.textContent = (currentIdx + 1) + " / " + galleryData.length;
+    }
+  }
+
+  document.addEventListener('click', (e) => {
+    const trigger = e.target.closest('[data-bs-target="#imageModal"][data-idx]');
+    if (!trigger) return;
+    const idx = parseInt(trigger.getAttribute('data-idx'), 10) || 0;
+    showImage(idx);
+  });
+
+  prevBtn?.addEventListener('click', () => showImage(currentIdx - 1));
+  nextBtn?.addEventListener('click', () => showImage(currentIdx + 1));
+
+  modalEl?.addEventListener('shown.bs.modal', () => {
+    const onKey = (ev) => {
+      if (ev.key === 'ArrowLeft') showImage(currentIdx - 1);
+      if (ev.key === 'ArrowRight') showImage(currentIdx + 1);
+    };
+    document.addEventListener('keydown', onKey);
+    modalEl.addEventListener('hidden.bs.modal', () => {
+      document.removeEventListener('keydown', onKey);
+      if (modalImg) {
+        modalImg.removeAttribute('src');
+        modalImg.removeAttribute('alt');
+      }
+    }, { once: true });
+  });
+</script>
+{% endblock %}
+
