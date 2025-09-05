@@ -1,72 +1,79 @@
-from django.conf import settings
+import uuid
+from decimal import Decimal
 from django.db import models
+from django_countries.fields import CountryField
+from products.models import Product
 
-User = settings.AUTH_USER_MODEL
+FREE_DELIVERY_THRESHOLD = Decimal('50.00')
+DELIVERY_FLAT = Decimal('4.99')
+
+# These models are generally from the boutique ado project,
+# but all of them are tweaked for my purpose
 
 
 class Order(models.Model):
-    class Status(models.TextChoices):
-        DRAFT = 'draft', 'Draft'
-        PENDING = 'pending', 'Pending'
-        PAID = 'paid', 'Paid'
-        SHIPPED = 'shipped', 'Shipped'
-        CANCELLED = 'cancelled', 'Cancelled'
-        REFUNDED = 'refunded', 'Refunded'
+    order_number = models.CharField(
+        max_length=20, unique=True, editable=False, null=False)
+    full_name = models.CharField(max_length=100, null=False, blank=False)
+    email = models.EmailField(max_length=250, null=False, blank=False)
+    phone_number = models.CharField(max_length=20, null=False, blank=False)
+    address1 = models.CharField(max_length=80, null=False, blank=False)
+    address2 = models.CharField(max_length=80, null=True, blank=True)
+    city = models.CharField(max_length=50, null=False, blank=False)
+    county = models.CharField(max_length=50, null=True, blank=True)
+    postcode = models.CharField(max_length=20, null=False, blank=False)
+    country = CountryField(
+        blank_label=' Select Country', null=False, blank=False)
 
-    user = models.ForeignKey(
-        User, on_delete=models.SET_NULL,
-        null=True, blank=True, related_name='orders')
-    status = models.CharField(
-        max_length=20, choices=Status.choices, default=Status.PENDING)
+    date = models.DateTimeField(auto_now_add=True)
 
-    subtotal = models.DecimalField(
-        max_digits=10, decimal_places=2, null=False, default=0)
-    shipping = models.DecimalField(
-        max_digits=10, decimal_places=2, null=False, default=0)
-    discount = models.DecimalField(
-        max_digits=10, decimal_places=2, null=False, default=0)
-    total = models.DecimalField(
-        max_digits=10, decimal_places=2, null=False, default=0)
+    delivery_cost = models.DecimalField(
+        max_digits=6, decimal_places=2, default=0)
+    order_total = models.DecimalField(
+        max_digits=10, decimal_places=2, default=0)
+    grand_total = models.DecimalField(
+        max_digits=10, decimal_places=2, default=0)
 
-    # Use string app labels to avoid circular imports across apps
-    shipping_address = models.ForeignKey(
-        "profiles.Address", on_delete=models.SET_NULL,
-        null=True, blank=True, related_name="shipping_orders")
-    billing_address = models.ForeignKey(
-        "profiles.Address", on_delete=models.SET_NULL,
-        null=True, blank=True, related_name="billing_orders")
+    original_bag = models.TextField(blank=False, null=False, default='')
+    stripe_pid = models.CharField(
+        max_length=250, blank=False, null=False, default='')
 
-    payment_intent_id = models.CharField(
-        max_length=200, blank=True)  # Stripe linkage
+    def _generate_order_number(self):
+        return uuid.uuid4().hex.upper()
 
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    def update_totals(self):
+        self.order_total = sum(
+            item.lineitem_total for item in self.lineitems.all()) or Decimal('0.00')
+        if self.order_total >= FREE_DELIVERY_THRESHOLD:
+            self.delivery_cost = Decimal('0.00')
+        else:
+            self.delivery_cost = DELIVERY_FLAT if self.order_total > 0 else Decimal('0.00')
+        self.grand_total = self.order_total + self.delivery_cost
+        self.save(
+            update_fields=['order_total', 'delivery_cost', 'grand_total',])
 
-    class Meta:
-        ordering = ['-created_at']
+    def save(self, *args, **kwargs):
+        if not self.order_number:
+            self.order_number = self._generate_order_number()
+        super().save(*args, **kwargs)
 
     def __str__(self):
-        return f'Order #{self.pk} - {self.status}'
+        return self.order_number
 
 
-class OrderItem(models.Model):
+class OrderLineItem(models.Model):
     order = models.ForeignKey(
-        Order, on_delete=models.CASCADE, related_name='items')
-    product = models.ForeignKey(
-        'products.Product', on_delete=models.PROTECT,
-        related_name='order_items')
-
-    # Snapshots to preserve price/name at purchase time
-    product_name = models.CharField(max_length=160)
-    unit_price = models.DecimalField(max_digits=10, decimal_places=2)
+        Order, related_name='lineitems', on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, on_delete=models.PROTECT)
     quantity = models.PositiveIntegerField(default=1)
-    line_total = models.DecimalField(max_digits=10, decimal_places=2)
+    lineitem_total = models.DecimalField(
+        max_digits=10, decimal_places=2, editable=False, default=0)
 
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    class Meta:
-        unique_together = ('order', 'product')
+    def save(self, *args, **kwargs):
+        price = getattr(
+            self.product, 'price', Decimal('0.00')) or Decimal('0.00')
+        self.lineitem_total = price * self.quantity
+        super().save(*args, **kwargs)
 
     def __str__(self):
-        return f'{self.product.name} x {self.quantity}'
+        return f'{self.product} x {self.quantity}'

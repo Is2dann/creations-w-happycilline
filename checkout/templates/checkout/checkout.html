@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% load static %}
+{% load crispy_forms_tags %}
+{% block content %}
+<div class="container py-4">
+    <h1 class="mb-4">Checkout</h1>
+
+    <div class="row g-4">
+        <div class="col-lg-7">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h2 class="h5 mb-3">Delivery Details</h2>
+                    <form action="{% url 'checkout:checkout' %}" method="POST">
+                        {% csrf_token %}
+                        {{ form|crispy }}
+                        <div class="mt-4 d-flex justify-content-between align-items-center">
+                            <a class="btn btn-outline-secondary" href="{% url 'bag:view_bag' %}">Back to Bag</a>
+                            <button class="btn btn-primary" type="submit">Place Order</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-5">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h2 class="h5 mb-3">Order Summary</h2>
+                    {% for row in items %}
+                        <div class="d-flex justify-content-between small py-1 border-bottom">
+                            <div>
+                                <div>{{ row.product.name }}</div>
+                                <div class="text-muted">Qty: {{ row.qty }}</div>
+                            </div>
+                            <div>£{{ row.line_total|floatformat:2 }}</div>
+                        </div>
+                    {% endfor %}
+                    <div class="d-flex justify-content-between mt-3"><span>Subtotal</span><strong>£{{ order_total|floatformat:2 }}</strong></div>
+                    <div class="d-flex justify-content-between"><span>Delivery</span><strong>£{{ delivery_cost|floatformat:2 }}</strong></div>
+                    <hr>
+                    <div class="d-flex justify-content-between"><span>Total</span><strong>£{{ grand_total|floatformat:2 }}</strong></div>
+                </div>
+            </div>
+            {% if order_total < free_threshold %}
+            <p class="small mt-2" style="color: white;">
+                Free delivery over £{{ free_threshold|floatformat:2 }} - spend
+                <strong>£{{ remaining_to_free|floatformat:2 }}</strong> more to qualify.
+            </p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

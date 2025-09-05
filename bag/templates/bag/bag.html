@@ -48,7 +48,7 @@
             </tfoot>
         </table>
         <div class="text-end">
-            <a class="btn btn-primary" href="#">Proceed to Checkout</a>
+            <a class="btn btn-primary" href="{% url 'checkout:checkout' %}">Proceed to Checkout</a>
         </div>
     {% else %}
         <p>Your bag is empty.</p>

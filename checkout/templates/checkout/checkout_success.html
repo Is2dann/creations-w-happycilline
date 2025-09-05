@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container py-5 text-center">
+    <h1 class="mb-3">Thank You!</h1>
+    <p>Your order <strong>{{ order.order_number }}</strong> has been placed.</p>
+    <p>We sent a confirmation to <strong>{{ order.email }}</strong>.</p>
+    <a class="btn btn-primary mt-3" href="/">Continue shopping</a>
+</div>
+{% endblock %}
