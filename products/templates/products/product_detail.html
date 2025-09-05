@@ -34,15 +34,13 @@
         <div class="mb-3">{{ product.description|linebreaks }}</div>
       {% endif %}
 
-      <!-- This is for bag app later -->
-      <!-- <form method="POST" action="#">
+      <form class="d-flex gap-2 align-items-center" method="POST" action="{% url 'bag:add_to_bag' product.id %}">
         {% csrf_token %}
-        <input type="hidden" name="product_slug" value="{{ product.slug }}">
-        <div class="input-group mb-3" style="max-width: 240px;">
-          <input type="number" class="form-control" name="quantity" min="1" value="1" required>
-          <button class="btn btn-cwh" type="submit">Add to bag</button>
-        </div>
-      </form> -->
+        <label for="id_qty" class="mb-0">Qty</label>
+        <input class="form-control" type="number" name="quantity" id="id_qty" value="1" min="1" style="max-width: 120px;">
+        <input type="hidden" name="redirect_url" value="{{ request.path }}">
+        <button class="btn btn-success" type="submit">Add to Bag</button>
+      </form>
 
       {% if product.category %}
         <p class="mb-0">

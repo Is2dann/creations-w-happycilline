@@ -25,7 +25,7 @@ urlpatterns = [
     path('', include('home.urls')),
     path('about/', include('about.urls')),
     path('products/', include(('products.urls', 'products'), namespace='products')),
-    # path('bag/', include('bag.urls')),
+    path('bag/', include('bag.urls', namespace='bag')),
     # path('checkout/', include(('checkout.urls', 'checkout'), namespace='checkout')),
     # # path('profile/', include(('profiles.urls', 'profiles'), namespace='profiles')),
     path('cms/', include('cms.urls')),  # Just leave it here for now as planned privacy and faqs on separate pages
