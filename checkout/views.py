@@ -1,9 +1,11 @@
 import json
 from decimal import Decimal
 from django.contrib import messages
+from django.contrib.auth.models import AnonymousUser
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.decorators.http import require_http_methods
 from products.models import Product
+from profiles.models import UserProfile
 from bag.views import _get_bag
 from .forms import OrderForm
 from .models import Order, OrderLineItem, FREE_DELIVERY_THRESHOLD, DELIVERY_FLAT
@@ -49,11 +51,28 @@ def checkout(request):
     else:
         remaining_to_free = Decimal('0.00')
 
+    initial = {}
+    if request.user.is_authenticated:
+        # Prefill from profile
+        profile = request.user.userprofile
+        initial = {
+            'phone_number': profile.phone_number,
+            'address1': profile.address1,
+            'address2': profile.address2,
+            'city': profile.city,
+            'county': profile.county,
+            'postcode': profile.postcode,
+            'country': profile.country,
+        }
+
     if request.method == 'POST':
         form = OrderForm(request.POST)
         if form.is_valid():
             order = form.save(commit=False)
             order.original_bag = json.dumps(bag)
+            # attach profile if logged in
+            if request.user.is_authenticated:
+                order.user_profile = request.user.userprofile
             order.save()
             for item in items:
                 OrderLineItem.objects.create(
@@ -62,8 +81,20 @@ def checkout(request):
                     quantity=item['qty'],
                 )
             order.update_totals()
-            request.session['bag'] = {}
 
+            # Save to profile if checkbox is ticked
+            if request.user.is_authenticated and request.POST.get('save_info'):
+                p = request.user.userprofile
+                p.phone_number = form.cleaned_data.get('phone_number', p.phone_number)
+                p.address1 = form.cleaned_data.get('address1', p.address1)
+                p.address2 = form.cleaned_data.get('address2', p.address2)
+                p.city = form.cleaned_data.get('city', p.city)
+                p.county = form.cleaned_data.get('county', p.county)
+                p.postcode = form.cleaned_data.get('postcode', p.postcode)
+                p.country = form.cleaned_data.get('country', p.country)
+                p.save()
+
+            request.session['bag'] = {}
             messages.success(
                 request, f'Order placed! Your order number is {
                     order.order_number}.')
@@ -71,7 +102,8 @@ def checkout(request):
                 'checkout:checkout_success', order_number=order.order_number)
         else:
             messages.error(
-                request, 'There was an error with your form. Please review and try again.')
+                request,
+                'There was an error with your form. Please review and try again.')
     else:
         form = OrderForm()
 

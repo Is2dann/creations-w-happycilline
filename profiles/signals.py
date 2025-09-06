@@ -1,15 +1,16 @@
-from django.conf import settings
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from .models import Profile
+from django.contrib.auth.models import User
+from .models import UserProfile
 
-User = settings.AUTH_USER_MODEL
 
-
-@receiver(post_save, sender=settings.AUTH_USER_MODEL)
-def create_profile_for_new_user(sender, instance, created, **kwargs):
+@receiver(post_save, sender=User)
+def create_or_update_user_profile(sender, instance, created, **kwargs):
     """
-    Create the user profile
+    Create or update the user profile
     """
     if created:
-        Profile.objects.get_or_create(user=instance)
+        UserProfile.objects.create(user=instance)
+    else:
+        # Ensure profile exists
+        UserProfile.objects.get_or_create(user=instance)

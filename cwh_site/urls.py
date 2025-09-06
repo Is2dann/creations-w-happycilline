@@ -24,10 +24,11 @@ urlpatterns = [
     path('accounts/', include('allauth.urls')),
     path('', include('home.urls')),
     path('about/', include('about.urls')),
-    path('products/', include(('products.urls', 'products'), namespace='products')),
+    path('products/', include((
+        'products.urls', 'products'), namespace='products')),
     path('bag/', include('bag.urls', namespace='bag')),
     path('checkout/', include('checkout.urls', namespace='checkout')),
-    # # path('profile/', include(('profiles.urls', 'profiles'), namespace='profiles')),
+    path('profile/', include('profiles.urls', namespace='profiles')),
     path('cms/', include('cms.urls')),  # Just leave it here for now as planned privacy and faqs on separate pages
     # path('newsletter/', include('newsletter.urls')),  # Newsletter is not wired up yet
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

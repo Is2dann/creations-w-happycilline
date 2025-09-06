@@ -1,4 +1,5 @@
 import uuid
+from django.conf import settings
 from decimal import Decimal
 from django.db import models
 from django_countries.fields import CountryField
@@ -8,10 +9,13 @@ FREE_DELIVERY_THRESHOLD = Decimal('50.00')
 DELIVERY_FLAT = Decimal('4.99')
 
 # These models are generally from the boutique ado project,
-# but all of them are tweaked for my purpose
+# but all of them are tweaked for my purpose and taste.
 
 
 class Order(models.Model):
+    user_profile = models.ForeignKey(
+        'profiles.UserProfile', null=True, blank=True,
+        on_delete=models.SET_NULL, related_name='orders')
     order_number = models.CharField(
         max_length=20, unique=True, editable=False, null=False)
     full_name = models.CharField(max_length=100, null=False, blank=False)
