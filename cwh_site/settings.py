@@ -206,6 +206,8 @@ STRIPE_WEBHOOK_SECRET = os.getenv('STRIPE_WEBHOOK_SECRET', '')
 STRIPE_CURRENCY = os.environ.get('STRIPE_CURRENCY', 'gbp')
 STRIPE_PRICE_MULTIPLIER = 100  # pounds to pence
 
+stripe.api_key = STRIPE_SECRET_KEY
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 

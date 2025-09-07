@@ -39,6 +39,8 @@
 
     // Build form data for caching
     const data = new FormData(form);
+    // Add client secret so the server can identify the payment intent
+    if (clientSecret) data.append('client_secret', clientSecret);
 
     // Cache checkout data on server (session)
     await fetch('/checkout/cache/', {
