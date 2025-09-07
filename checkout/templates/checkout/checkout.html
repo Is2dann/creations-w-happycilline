@@ -10,7 +10,7 @@
             <div class="card shadow-sm">
                 <div class="card-body">
                     <h2 class="h5 mb-3">Delivery Details</h2>
-                    <form action="{% url 'checkout:checkout' %}" method="POST">
+                    <form id="checkoutForm" novalidate>
                         {% csrf_token %}
                         {{ form|crispy }}
                         {% if request.user.is_authenticated %}
@@ -19,10 +19,18 @@
                             <label class="form-check-label" for="id_save_info">Save this info to my profile</label>
                         </div>
                         {% endif %}
+
+                        <hr class="my-4">
+                        <h2 class="h6 mb-3">Payment</h2>
+                        <div id="payment-element"><!-- Stripe injects here --></div>
+
                         <div class="mt-4 d-flex justify-content-between align-items-center">
                             <a class="btn btn-outline-secondary" href="{% url 'bag:view_bag' %}">Back to Bag</a>
-                            <button class="btn btn-primary" type="submit">Place Order</button>
+                            <button id="payButton" class="btn btn-primary" type="submit" data-client-secret="{{ client_secret }}">
+                                Pay £{{ grand_total|floatformat:2 }}
+                            </button>
                         </div>
+                        <p id="cardErrors" class="text-danger small mt-2" role="alert" style="display: none;"></p>
                     </form>
                 </div>
             </div>
@@ -56,4 +64,8 @@
         </div>
     </div>
 </div>
+
+<script>window.STRIPE_PUBLIC_KEY = "{{ stripe_public_key|escapejs }}";</script>
+<script src="https://js.stripe.com/v3/"></script>
+<script src="{% static 'js/stripe.js' %}"></script>
 {% endblock %}
