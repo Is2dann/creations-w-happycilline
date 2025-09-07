@@ -16,7 +16,7 @@ from django.views.decorators.http import require_http_methods
 from bag.views import _get_bag
 from products.models import Product
 from profiles.models import UserProfile
-# from .emails import send_order_confirmation  # for later use
+from .emails import send_order_confirmation
 from .forms import OrderForm
 from .models import (
     FREE_DELIVERY_THRESHOLD,
@@ -297,7 +297,7 @@ def stripe_webhook(request):
             p.country = metadata.get('country', p.country)
             p.save()
 
-        # email (for later use)
+        
         try:
             send_order_confirmation(order)
         except Exception as e:
@@ -315,7 +315,6 @@ def stripe_webhook(request):
         logger.exception("Webhook failed for %s: %s", stripe_pid, e)
         # Returning 200 stops Stripe from endlessly retrying
         return HttpResponse(status=200)
-
 
 
 @require_http_methods(["GET"])
