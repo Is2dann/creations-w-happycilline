@@ -58,7 +58,18 @@
                     <li class="nav-item"><a class="nav-link" href="{% url 'account_login' %}">Sign In</a></li>
                     <li class="nav-item"><a class="nav-link" href="{% url 'account_signup' %}">Sign Up</a></li>
                     {% endif %}
-                    <li class="nav-item"><a class="nav-link" href="{% url 'bag:view_bag' %}">Bag</a></li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link position-relative" href="#" id="miniBagToggle"
+                            role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <span class="me-1">Bag</span>
+                                {% if bag_item_count %}
+                                <span class="badge bg-primary rounded-pill align-text-top">{{ bag_item_count }}</span>
+                                {% endif %}
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-end p-0 shadow" aria-labelledby="miniBagToggle" style="min-width: 320px; max-width: 360px;">
+                            {% include "bag/_mini_bag.html" %}
+                        </div>
+                    </li>
 
                 </ul>
             </div>

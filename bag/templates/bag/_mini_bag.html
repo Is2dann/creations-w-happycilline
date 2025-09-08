@@ -1,0 +1,52 @@
+{% if mini_bag_items %}
+    <div class="p-3">
+        {% for it in mini_bag_items %}
+            <div class="d-flex align-items-center gap-2 mb-2">
+                {% if it.thumb_url %}
+                <img src="{{ it.thumb_url }}" alt="{{ it.name }}" class="rounded"
+                    style="width:48px;height:48px;object-fit:cover;">
+                {% endif %}
+                <div class="flex-grow-1">
+                    <div class="fw-semibold small">
+                    {% if it.product.slug %}
+                        <a class="link-dark text-decoration-none" href="{% url 'products:detail' it.product.slug %}">
+                            {{ it.name }}
+                        </a>
+                    {% else %}
+                        {{ it.name }}
+                    {% endif %}
+                    </div>
+                    <div class="text-muted small">
+                        Qty {{ it.qty }} · £{{ it.price|floatformat:2 }}
+                    </div>
+                </div>
+            <div class="small">£{{ it.line_total|floatformat:2 }}</div>
+            </div>
+        {% endfor %}
+
+    <hr class="my-2">
+
+        <div class="d-flex justify-content-between small">
+            <span>Subtotal</span><strong>£{{ bag_order_total|floatformat:2 }}</strong>
+        </div>
+        <div class="d-flex justify-content-between small">
+            <span>Delivery</span><strong>£{{ bag_delivery_cost|floatformat:2 }}</strong>
+        </div>
+        <div class="d-flex justify-content-between">
+            <span>Total</span><strong>£{{ bag_grand_total|floatformat:2 }}</strong>
+        </div>
+
+        {% if bag_remaining_to_free > 0 %}
+        <p class="text-muted small mt-2">
+            Spend £{{ bag_remaining_to_free|floatformat:2 }} more to get free delivery.
+        </p>
+        {% endif %}
+
+        <div class="d-grid gap-2 mt-3">
+            <a class="btn btn-sm btn-primary" href="{% url 'checkout:checkout' %}">Checkout</a>
+            <a class="btn btn-sm btn-outline-secondary" href="{% url 'bag:view_bag' %}">View bag</a>
+        </div>
+    </div>
+{% else %}
+    <div class="p-3 text-center text-muted small">Your bag is empty.</div>
+{% endif %}
