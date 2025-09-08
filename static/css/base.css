@@ -51,7 +51,7 @@ h1, h2, h3, .display-1, .display-2, .display-3 {
     color: var(--cwh-gold);
 }
 
-btn-cwh {
+.btn-cwh {
     background: var(--cwh-gold);
     color: #2a231a;
     border: none;

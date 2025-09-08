@@ -5,17 +5,36 @@
 
     <div class="container py-4">
 
-        <hr class="my-4">
-
-        <h2 class="h4 mb-3">Latest Products</h2>
-        <div class="row g-3">
-            {% for p in latest_products %}
-                <div class="col-6 col-md-4 col-lg-3">
-                    {% include 'products/partials/_product_card.html' with product=p %}
+        
+        <section class="container">
+            <div class="mx-auto max-w-3xl text-center">
+                <h1 class="display-5 mb-3">Welcome to <span class="script logo-span">Creations with Happycilline</span></h1>
+                <p class="lead">Handcrafted wreaths, centerpieces and seasonal décor made with love and a hint of Happycilline</p>
+                <div class="d-flex gap-3 justify-content-center mt-4">
+                    <a class="btn btn-secondary btn-cwh" href="{% url 'products:list' %}">Shop Now</a>
+                    <a class="btn btn-secondary btn-cwh" href="{% url 'bag:view_bag' %}">View Bag</a>
                 </div>
-            {% empty %}
-                <p>No products yet.</p>
-            {% endfor %}
+            </div>
+        </section>
+        <hr class="my-4">
+        <div class="rounded-3">
+            <h2 class="display-5 fw-bold">Handmade. Heartfelt. Happycilline.</h2>
+            <p class="lead mb-4">Wreaths, centerpieces, door decor, and our signature Krapeks - unique pieces made for every season.</p>
+            <p>Hello, my name is Marta.</p>
+            <p>
+                You are probably wondering about the name "Creations with Happycilline."
+                Well the short story is, that I love cats and I have a beautiful Calico female cat called Happy,
+                because she brought happiness into my life. And as pennicillin is strong health drug in medicine,
+                as Happy is my health and mood drug for my everydays.
+            </p>
+            <p>
+                I create handmade decorations for your home and for you. My signature pieces are the "Krapeks".
+                This is a Hungarian word for "guys or fellas" in rough translation. <br>
+                These funny and nice pieces can be customised for any kind of occasions or taste.
+                Custom pieces usually not be shown in my products pages, unless they are allowed by the customer.
+                Simply because these pieces can be any kind, some customer goes funny some are more than that...
+            </p>
         </div>
+        
     </div>
 {% endblock %}

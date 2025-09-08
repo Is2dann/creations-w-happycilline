@@ -1,12 +1,135 @@
 {% extends "base.html" %}
-{% block title %}{{ category.name }} – Products{% endblock %}
+{% load static %}
+{% block title %}{% if category %}{{ category.name }} - {% endif %}Products{% endblock %}
 {% block content %}
 
 <div class="container py-4">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h1 class="mb-0">{{ category.name }}</h1>
-        <a class="btn btn-cwh-outline" href="{% url 'products:list' %}">All categories</a>
+    <div class="d-flex flex-wrap align-items-center justify-content-between mb-3">
+        <div class="d-flex align-items-baseline gap-2">
+            <h1 class="mb-0">{% if category %}{{ category.name }}{% else %}Products{% endif %}</h1>
+        {% if total is not None %}
+            <span class="small">({{ total }} results)</span>
+        {% endif %}
+        </div>
+        <div class="d-flex gap-2">
+        {% if category %}
+            <a class="btn btn-cwh-outline" href="{% url 'products:list' %}">All categories</a>
+        {% endif %}
+        </div>
     </div>
+
+<!-- Filter / sort / per-page bar -- Mobile -->
+    <div class="d-md-none mb-3">
+        <button class="btn btn-outline-secondary w-100"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#filtersCollapse"
+            aria-expanded="false"
+            aria-controls="filtersCollapse">
+                Filters & sort
+        </button>
+
+        <div class="collapse mt-2" id="filtersCollapse">
+            <form method="get" class="card card-body">
+                <div class="mb-3">
+                    <label class="form-label">Search</label>
+                    <input class="form-control" type="text" name="q" value="{{ q }}" placeholder="Search products…">
+                </div>
+
+                {% if categories %}
+                <div class="mb-3">
+                    <label class="form-label">Category</label>
+                    <select class="form-select" name="category">
+                        <option value="">All categories</option>
+                        {% for c in categories %}
+                            <option value="{{ c.slug }}" {% if category_param == c.slug %}selected{% endif %}>{{ c.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                {% endif %}
+
+                <div class="mb-3">
+                    <label class="form-label">Sort</label>
+                    <select class="form-select" name="sort">
+                        <option value="newest"  {% if sort_param == "newest" %}selected{% endif %}>Newest</option>
+                        <option value="name"    {% if sort_param == "name" %}selected{% endif %}>Name (A-Z)</option>
+                        <option value="-name"   {% if sort_param == "-name" %}selected{% endif %}>Name (Z-A)</option>
+                        <option value="price"   {% if sort_param == "price" %}selected{% endif %}>Price (low→high)</option>
+                        <option value="-price"  {% if sort_param == "-price" %}selected{% endif %}>Price (high→low)</option>
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Per page</label>
+                    <select class="form-select" name="per">
+                        {% for n in per_options %}
+                            <option value="{{ n }}" {% if per_page == n %}selected{% endif %}>{{ n }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="d-grid gap-2">
+                    <button class="btn btn-primary" type="submit">Apply</button>
+                    {% if category %}
+                        <a class="btn btn-outline-secondary" href="{% url 'products:category' category.slug %}">Reset</a>
+                    {% else %}
+                        <a class="btn btn-outline-secondary" href="{% url 'products:list' %}">Reset</a>
+                    {% endif %}
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+<!-- Filter / sort / per-page bar -- Desktop -->
+    <form class="row gy-2 gx-2 align-items-end mb-3 d-none d-md-flex" method="get">
+        <div class="col-md-5">
+            <label class="form-label">Search</label>
+            <input class="form-control" type="text" name="q" value="{{ q }}" placeholder="Search products…">
+        </div>
+
+        {% if categories %}
+        <div class="col-md-3">
+            <label class="form-label">Category</label>
+            <select class="form-select" name="category">
+            <option value="">All categories</option>
+            {% for c in categories %}
+                <option value="{{ c.slug }}" {% if category_param == c.slug %}selected{% endif %}>{{ c.name }}</option>
+            {% endfor %}
+            </select>
+        </div>
+        {% endif %}
+
+        <div class="col-md-2">
+            <label class="form-label">Sort</label>
+            <select class="form-select" name="sort">
+            <option value="newest"  {% if sort_param == "newest" %}selected{% endif %}>Newest</option>
+            <option value="name"    {% if sort_param == "name" %}selected{% endif %}>Name (A-Z)</option>
+            <option value="-name"   {% if sort_param == "-name" %}selected{% endif %}>Name (Z-A)</option>
+            <option value="price"   {% if sort_param == "price" %}selected{% endif %}>Price (low→high)</option>
+            <option value="-price"  {% if sort_param == "-price" %}selected{% endif %}>Price (high→low)</option>
+            </select>
+        </div>
+
+        <div class="col-md-2">
+            <label class="form-label">Per page</label>
+            <select class="form-select" name="per">
+            {% for n in per_options %}
+                <option value="{{ n }}" {% if per_page == n %}selected{% endif %}>{{ n }}</option>
+            {% endfor %}
+            </select>
+        </div>
+
+        <div class="col-auto">
+            <button class="btn btn-primary">Apply</button>
+                {% if category %}
+                    <a class="btn btn-outline-secondary" href="{% url 'products:category' category.slug %}">Reset</a>
+                {% else %}
+                    <a class="btn btn-outline-secondary" href="{% url 'products:list' %}">Reset</a>
+                {% endif %}
+        </div>
+    </form>
+
 
     <div class="row g-3">
         {% for product in page_obj %}
@@ -14,34 +137,40 @@
                 {% include 'products/partials/_product_card.html' with product=product %}
             </div>
         {% empty %}
-            <div class="alert alert-warning">No products in this category yet.</div>
+            <div class="alert alert-warning">No products found.</div>
         {% endfor %}
     </div>
 
     {% if page_obj.paginator.num_pages > 1 %}
         <nav class="mt-4" aria-label="Pagination">
             <ul class="pagination justify-content-center">
-                {% if page_obj.has_previous %}
-                    <li class="page-item">
-                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Prev</a>
-                    </li>
-                {% else %}
-                    <li class="page-item disabled"><span class="page-link">Prev</span></li>
-                {% endif %}
+            {% if page_obj.has_previous %}
+                <li class="page-item">
+                    <a class="page-link"
+                        href="?page={{ page_obj.previous_page_number }}&q={{ q|urlencode }}&sort={{ sort_param }}&per={{ per_page }}&category={{ category_param|urlencode }}">
+                            Prev
+                    </a>
+                </li>
+            {% else %}
+                <li class="page-item disabled"><span class="page-link">Prev</span></li>
+            {% endif %}
 
                 <li class="page-item active">
                     <span class="page-link">
-                        Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+                    Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
                     </span>
                 </li>
 
-                {% if page_obj.has_next %}
-                    <li class="page-item">
-                        <a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a>
-                    </li>
-                {% else %}
-                    <li class="page-item disabled"><span class="page-link">Next</span></li>
-                {% endif %}
+            {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link"
+                        href="?page={{ page_obj.next_page_number }}&q={{ q|urlencode }}&sort={{ sort_param }}&per={{ per_page }}&category={{ category_param|urlencode }}">
+                            Next
+                    </a>
+                </li>
+            {% else %}
+                <li class="page-item disabled"><span class="page-link">Next</span></li>
+            {% endif %}
             </ul>
         </nav>
     {% endif %}
