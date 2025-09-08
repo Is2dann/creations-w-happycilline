@@ -1,17 +1,15 @@
 # checkout/views.py
 import json
 import time
-import logging
-logger = logging.getLogger(__name__)
-from decimal import Decimal
-
 import stripe
+
 from django.conf import settings
 from django.contrib import messages
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
+from decimal import Decimal
 
 from bag.views import _get_bag
 from products.models import Product
@@ -24,6 +22,10 @@ from .models import (
     Order,
     OrderLineItem,
 )
+# Used the logger to find bugs during Stripe integration,
+# but as they are useful later too, I leave them in the code.
+import logging
+logger = logging.getLogger(__name__)
 
 # ---------- Helpers ----------
 
@@ -297,7 +299,6 @@ def stripe_webhook(request):
             p.country = metadata.get('country', p.country)
             p.save()
 
-        
         try:
             send_order_confirmation(order)
         except Exception as e:
@@ -439,7 +440,8 @@ def checkout_paid(request):
                 grand_total=grand_total,
                 original_bag=json.dumps(bag),
                 user_profile=getattr(
-                    request.user, 'userprofile', None) if request.user.is_authenticated else None,
+                    request.user, 'userprofile', None
+                ) if request.user.is_authenticated else None,
             ),
         )
         if created:
@@ -448,6 +450,13 @@ def checkout_paid(request):
                     order=order,
                     product=item['product'],
                     quantity=item['qty']
+                )
+            try:
+                send_order_confirmation(order)
+            except Exception as e:
+                logger.exception(
+                    'Order is created via return-url; email failed: %s',
+                    order.order_number, e
                 )
 
     request.session['bag'] = {}
