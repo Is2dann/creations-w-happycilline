@@ -1,0 +1,1 @@
+web: gunicorn cwh_site.wsgi:application
