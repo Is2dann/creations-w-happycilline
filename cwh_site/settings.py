@@ -105,10 +105,6 @@ TEMPLATES = [
                 'django.template.context_processors.media',
                 'bag.context_processors.bag_items_count',
             ],
-            # 'builtins': [
-            #     'crispy_forms.templatetags.crispy_forms_tags',
-            #     'crispy_forms.templatetags.crispy_forms_fields',  # From boutique_ado walkthrough
-            # ]
         },
     },
 ]
