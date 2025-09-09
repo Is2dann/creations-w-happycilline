@@ -215,12 +215,30 @@ if USE_AWS:
         f"{AWS_STORAGE_BUCKET_NAME}.s3.{AWS_S3_REGION_NAME}.amazonaws.com",
     )
 
-    STATICFILES_STORAGE = "custom_storages.StaticStorage"
-    DEFAULT_FILE_STORAGE = "custom_storages.MediaStorage"
+    # STATICFILES_STORAGE = "custom_storages.StaticStorage"
+    # DEFAULT_FILE_STORAGE = "custom_storages.MediaStorage"
+
+    STORAGES = {
+        'default': {
+            'BACKEND': 'custom_storages.MediaStorage',
+        },
+        'staticfiles': {
+            'BACKEND': 'custom_storages.StaticStorage',
+        },
+    }
 
     STATIC_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/staticfiles/"
     MEDIA_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/media/"
 else:
+    STORAGES = {
+        'default': {
+            'BACKEND': 'django.core.files.storage.FileSystemStorage',
+        },
+        'staticfiles': {
+            'BACKEND': 'whitenoise.storage.CompressedManifestStaticFilesStorage',
+        },
+    }
+
     STATIC_URL = "/static/"
     MEDIA_URL = "/media/"
 
