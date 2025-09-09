@@ -18,6 +18,7 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
+from .views import handler404
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -31,4 +32,4 @@ urlpatterns = [
     path('cms/', include('cms.urls')),  # Just leave it here for now as planned privacy and faqs on separate pages
     # path('newsletter/', include('newsletter.urls')),  # Newsletter is not wired up yet
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-# handler404 = 'cwh_site.views.handler404'  # for later use
+handler404 = 'cwh_site.views.handler404'
