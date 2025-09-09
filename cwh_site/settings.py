@@ -219,7 +219,7 @@ if USE_AWS:
     STATICFILES_STORAGE = "custom_storages.StaticStorage"
     DEFAULT_FILE_STORAGE = "custom_storages.MediaStorage"
 
-    STATIC_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/static/"
+    STATIC_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/staticfiles/"
     MEDIA_URL  = f"https://{AWS_S3_CUSTOM_DOMAIN}/media/"
 else:
     STATIC_URL = "/static/"
