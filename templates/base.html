@@ -51,8 +51,10 @@
                     <li class="nav-item"><a class="nav-link" href="{% url 'admin:index' %}">| Admin |</a></li>
                     {% endif %}
                     <li class="nav-item"><a class="nav-link" href="{% url 'products:list' %}">Shop</a></li>
-                    {% if user.is_authenticated %}
+                    {% if user.is_authenticated and user.userprofile_id %}
                     <li class="nav-item"><a class="nav-link" href="{% url 'profiles:profile' %}">My Profile</a></li>
+                    {% endif %}
+                    {% if user.is_authenticated %}
                     <li class="nav-item"><a class="nav-link" href="{% url 'account_logout' %}">Sign Out</a></li>
                     {% else %}
                     <li class="nav-item"><a class="nav-link" href="{% url 'account_login' %}">Sign In</a></li>
