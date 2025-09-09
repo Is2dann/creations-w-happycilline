@@ -29,7 +29,6 @@ urlpatterns = [
     path('bag/', include('bag.urls', namespace='bag')),
     path('checkout/', include('checkout.urls', namespace='checkout')),
     path('profile/', include('profiles.urls', namespace='profiles')),
-    path('cms/', include('cms.urls')),  # Just leave it here for now as planned privacy and faqs on separate pages
-    # path('newsletter/', include('newsletter.urls')),  # Newsletter is not wired up yet
+    path("info/", include(("cms.urls", "policies"), namespace="policies")),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 handler404 = 'cwh_site.views.handler404'

@@ -1,0 +1,4 @@
+User-agent: *
+Disallow: /accounts/
+Disallow: /profiles/
+Sitemap: https://creations-w-happycilline-54784e178ac3.herokuapp.com/sitemap.xml

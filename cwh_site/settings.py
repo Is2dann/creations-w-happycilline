@@ -65,7 +65,6 @@ INSTALLED_APPS = [
     'products',
     'checkout',
     'bag',
-    'newsletter',
     'cms',
 
     # Other
@@ -220,10 +219,10 @@ if USE_AWS:
     DEFAULT_FILE_STORAGE = "custom_storages.MediaStorage"
 
     STATIC_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/staticfiles/"
-    MEDIA_URL  = f"https://{AWS_S3_CUSTOM_DOMAIN}/media/"
+    MEDIA_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/media/"
 else:
     STATIC_URL = "/static/"
-    MEDIA_URL  = "/media/"
+    MEDIA_URL = "/media/"
 
 
 # Stripe

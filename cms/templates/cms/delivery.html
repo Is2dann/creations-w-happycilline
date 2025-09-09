@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}Delivery Information | Creations with Happycilline{% endblock %}
+{% block meta_description %}{% with meta_description="Delivery options, times and costs for orders from Creations with Happycilline." %}{% endblock %}
+{% block content %}
+<div class="container py-4">
+  <h1 class="h4 mb-3">Delivery Information</h1>
+  <p class="text-muted">Last updated: {{ now|date:"j F Y" }}</p>
+
+  <h2 class="h6 mt-4">UK Delivery</h2>
+  <ul>
+    <li><strong>Standard:</strong> £4.99 — 2-4 working days after dispatch.</li>
+    <li><strong>Free delivery over £50:</strong> applied automatically at checkout.</li>
+  </ul>
+
+  <h2 class="h6 mt-4">Processing & Dispatch</h2>
+  <p>Most orders dispatch within 1-2 working days. Handmade or personalised items may take longer; any extra lead time is shown on the product page.</p>
+
+  <h2 class="h6 mt-4">Tracking</h2>
+  <p>We'll email you when your order is on the way. Tracked services include a tracking link where available.</p>
+
+  <h2 class="h6 mt-4">Delivery Address</h2>
+  <p>Please ensure your address is correct at checkout. We can't redirect parcels once shipped.</p>
+
+  <h2 class="h6 mt-4">Questions?</h2>
+  <p>Contact us and we'll be happy to help.</p>
+</div>
+{% endblock %}

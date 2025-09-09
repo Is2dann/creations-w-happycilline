@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}Terms & Returns | Creations with Happycilline{% endblock %}
+{% block meta_description %}{% with meta_description="Terms of service, returns and refunds policy for Creations with Happycilline." %}{% endblock %}
+{% block content %}
+<div class="container py-4">
+  <h1 class="h4 mb-3">Terms & Returns</h1>
+  <p class="text-muted">Last updated: {{ now|date:"j F Y" }}</p>
+
+  <h2 class="h6 mt-4">Ordering</h2>
+  <p>Orders are accepted when payment is successfully processed. You'll receive an order confirmation by email.</p>
+
+  <h2 class="h6 mt-4">Pricing & Payment</h2>
+  <p>All prices are in GBP and include VAT where applicable. We accept major cards via Stripe.</p>
+
+  <h2 class="h6 mt-4">Returns</h2>
+  <ul>
+    <li><strong>Change of mind:</strong> return within <strong>30 days</strong> of delivery in original condition for a refund.</li>
+    <li><strong>Exclusions:</strong> personalised or custom-made items unless faulty.</li>
+    <li><strong>How to return:</strong> contact us with your order number to receive return instructions.</li>
+    <li><strong>Refunds:</strong> processed to the original payment method within 5-10 working days after inspection.</li>
+  </ul>
+
+  <h2 class="h6 mt-4">Faulty/Damaged Items</h2>
+  <p>If something arrives damaged or faulty, contact us within 14 days with photos and your order number; we'll arrange a replacement or refund.</p>
+
+  <h2 class="h6 mt-4">Your Data</h2>
+  <p>See our <a href="https://www.termsfeed.com/live/df140890-e53d-4dbd-ae2c-3c60cbdfc8df" target="_blank" aria-label="Privacy Policy link (opens in new tab)" rel="noopener" nofollow>Privacy Policy</a> for how we handle your information.</p>
+
+  <h2 class="h6 mt-4">Contact</h2>
+  <p>Questions? Get in touch and we'll help.</p>
+</div>
+{% endblock %}
