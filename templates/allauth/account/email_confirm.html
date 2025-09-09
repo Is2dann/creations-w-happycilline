@@ -1,39 +1,60 @@
-{% extends "account/base_entrance.html" %}
+{% extends "base.html" %}
+{% load static %}
 {% load i18n %}
-{% load account %}
-{% load allauth %}
-{% block head_title %}
-    {% trans "Confirm Email Address" %}
-{% endblock head_title %}
+{% block title %}Confirm your email | Creations with Happycilline{% endblock %}
+
 {% block content %}
-    {% element h1 %}
-        {% trans "Confirm Email Address" %}
-    {% endelement %}
-    {% if confirmation %}
-        {% user_display confirmation.email_address.user as user_display %}
-        {% if can_confirm %}
-            {% element p %}
-                {% blocktrans with confirmation.email_address.email as email %}Please confirm that <a href="mailto:{{ email }}">{{ email }}</a> is an email address for user {{ user_display }}.{% endblocktrans %}
-            {% endelement %}
-            {% url 'account_confirm_email' confirmation.key as action_url %}
-            {% element form method="post" action=action_url %}
-                {% slot actions %}
-                    {% csrf_token %}
-                    {{ redirect_field }}
-                    {% element button type="submit" %}
-                        {% trans 'Confirm' %}
-                    {% endelement %}
-                {% endslot %}
-            {% endelement %}
-        {% else %}
-            {% element p %}
-                {% blocktrans %}Unable to confirm {{ email }} because it is already confirmed by a different account.{% endblocktrans %}
-            {% endelement %}
-        {% endif %}
-    {% else %}
-        {% url 'account_email' as email_url %}
-        {% element p %}
-            {% blocktrans %}This email confirmation link expired or is invalid. Please <a href="{{ email_url }}">issue a new email confirmation request</a>.{% endblocktrans %}
-        {% endelement %}
-    {% endif %}
-{% endblock content %}
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+      <div class="card shadow-sm">
+        <div class="card-body p-4">
+          <h1 class="h4 mb-3">{% trans "Confirm e-mail address" %}</h1>
+
+          {% if confirmation %}
+            {% with email=confirmation.email_address.email %}
+              <p class="mb-4">
+                {% blocktrans with email=email %}
+                  Please confirm that <strong>{{ email }}</strong> is your e-mail address.
+                {% endblocktrans %}
+              </p>
+
+              {% if confirmation.email_address.verified %}
+                <div class="alert alert-info" role="alert">
+                  {% trans "This e-mail address has already been confirmed." %}
+                </div>
+                <a class="btn btn-primary" href="{% url 'account_login' %}">
+                  {% trans "Continue to sign in" %}
+                </a>
+              {% else %}
+                <form method="post" action="{% url 'account_confirm_email' confirmation.key %}">
+                  {% csrf_token %}
+                  <button type="submit" class="btn btn-primary w-100">
+                    {% trans "Confirm e-mail" %}
+                  </button>
+                </form>
+              {% endif %}
+            {% endwith %}
+          {% else %}
+            <div class="alert alert-warning" role="alert">
+              {% trans "This e-mail confirmation link is invalid or has expired." %}
+            </div>
+            <p class="mb-4">
+              {% trans "You can request a new confirmation e-mail from your account e-mail settings." %}
+            </p>
+            <a class="btn btn-primary" href="{% url 'account_email' %}">
+              {% trans "Manage e-mail addresses" %}
+            </a>
+          {% endif %}
+
+          <hr class="my-4">
+          <div class="d-flex gap-2">
+            <a class="btn btn-outline-secondary" href="{% url 'account_login' %}">{% trans "Sign in" %}</a>
+            <a class="btn btn-outline-secondary" href="{% url 'account_signup' %}">{% trans "Create an account" %}</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
