@@ -5,7 +5,10 @@ from django_countries.fields import CountryField
 
 
 class UserProfile(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='userprofile')
+    full_name = models.CharField(max_length=100, null=True, blank=True)
+    email = models.EmailField(max_length=250, null=True, blank=True)
+    user = models.OneToOneField(
+        User, on_delete=models.CASCADE, related_name='userprofile')
     phone_number = models.CharField(max_length=20, null=True, blank=True)
     address1 = models.CharField(max_length=80, null=True, blank=True)
     address2 = models.CharField(max_length=80, null=True, blank=True)
