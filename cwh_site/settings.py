@@ -217,12 +217,12 @@ if USE_AWS:
 
     # Django 5: use STORAGES
     STORAGES = {
-        "default": {"BACKEND": "custom_storages.MediaStorage"},
-        "staticfiles": {"BACKEND": "custom_storages.StaticStorage"},
+        "default": {"BACKEND": "cwh_site.custom_storages.MediaStorage"},
+        "staticfiles": {"BACKEND": "cwh_site.custom_storages.StaticStorage"},
     }
 
     STATIC_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/staticfiles/"
-    MEDIA_URL  = f"https://{AWS_S3_CUSTOM_DOMAIN}/media/"
+    MEDIA_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/media/"
 else:
     # Local / WhiteNoise
     STORAGES = {
@@ -230,7 +230,7 @@ else:
         "staticfiles": {"BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage"},
     }
     STATIC_URL = "/static/"
-    MEDIA_URL  = "/media/"
+    MEDIA_URL = "/media/"
 
 
 # Stripe
