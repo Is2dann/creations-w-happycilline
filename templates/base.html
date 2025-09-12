@@ -52,7 +52,10 @@
                     {% if user.is_authenticated and user.is_staff %}
                     <li class="nav-item"><a class="nav-link" href="{% url 'admin:index' %}">| Admin |</a></li>
                     {% endif %}
+                    <li class="nav-item"><a class="nav-link" href="{% url 'products:list' %}">Browse</a></li>
+                    {% if user.is_authenticated %}
                     <li class="nav-item"><a class="nav-link" href="{% url 'products:list' %}">Shop</a></li>
+                    {% endif %}
                     {% if user.is_authenticated %}
                     <li class="nav-item"><a class="nav-link" href="{% url 'profiles:profile' %}">My Profile</a></li>
                     <li class="nav-item"><a class="nav-link" href="{% url 'account_logout' %}">Sign Out</a></li>
@@ -112,7 +115,7 @@
                 </li>
                 <li class="nav-item"><a class="nav-link px-0" href="{% url 'policies:delivery' %}">Delivery</a></li>
                 <li class="nav-item"><a class="nav-link px-0" href="{% url 'policies:terms' %}">Terms and returns</a></li>
-                <li class="nav-item"><a class="nav-link px-0" href="#">FAQs</a></li>
+                <li class="nav-item"><a class="nav-link px-0" href="{% url 'policies:faqs' %}">FAQs</a></li>
                 <li class="nav-item">
                     <a class="nav-link px-0"
                     href="https://www.facebook.com/people/Creations-with-Happycilline/100087224732794/" 
