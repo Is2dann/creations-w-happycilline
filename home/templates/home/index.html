@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 {% block title %}Home | Creations with Happycilline{% endblock %}
 {% block meta_desc %}Discover handmade wreaths, Krapeks, and seasonal decor crafted with love.{% endblock %}
+{% load static %}
 {% block content %}
 
     <div class="container py-4">
@@ -9,10 +10,11 @@
             <div class="mx-auto max-w-3xl text-start">
                 <h1 class="display-5 mb-3">Welcome to <span class="script logo-span">Creations with Happycilline</span></h1>
                 <p class="lead">Handcrafted wreaths, centerpieces and seasonal décor made with love and a hint of Happycilline</p>
-                <div class="d-flex gap-3  mt-4">
-                    <a class="btn btn-secondary btn-cwh" href="{% url 'products:list' %}">Browse</a>
+                <div class="d-flex gap-3 mt-4">
                     {% if user.is_authenticated %}
-                    <a class="btn btn-secondary btn-cwh" href="{% url 'products:list' %}">Shop Now</a>
+                    <a class="btn btn-secondary btn-cwh" href="{% url 'products:list' %}">Shop</a>
+                    {% else %}
+                    <a class="btn btn-secondary btn-cwh" href="{% url 'products:list' %}">Browse</a>
                     {% endif %}
                     <a class="btn btn-secondary btn-cwh" 
                         href="https://www.facebook.com/people/Creations-with-Happycilline/100087224732794/" 
@@ -22,9 +24,10 @@
                         href="https://www.instagram.com/creations_with_happycilline"
                         target="_blank" rel="noopener" aria-label="Visit my Instagram page (opens in a new tab)" nofollow><i class="fa-brands fa-instagram"></i></a>
                     {% if user.is_authenticated %}
-                    <a class="btn btn-secondary btn-cwh" href="{% url 'bag:view_bag' %}">View Bag</a>
-                    {% endif %}
+                    <a class="btn btn-secondary btn-cwh" href="{% url 'bag:view_bag' %}">Bag</a>
+                    {% else %}
                     <a class="btn btn-secondary btn-cwh" href="{% url 'account_login' %}">Sign in/up</a>
+                    {% endif %}
                 </div>
             </div>
         </section>

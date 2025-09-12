@@ -52,9 +52,10 @@
                     {% if user.is_authenticated and user.is_staff %}
                     <li class="nav-item"><a class="nav-link" href="{% url 'admin:index' %}">| Admin |</a></li>
                     {% endif %}
-                    <li class="nav-item"><a class="nav-link" href="{% url 'products:list' %}">Browse</a></li>
                     {% if user.is_authenticated %}
                     <li class="nav-item"><a class="nav-link" href="{% url 'products:list' %}">Shop</a></li>
+                    {% else %}
+                    <li class="nav-item"><a class="nav-link" href="{% url 'products:list' %}">Browse</a></li>
                     {% endif %}
                     {% if user.is_authenticated %}
                     <li class="nav-item"><a class="nav-link" href="{% url 'profiles:profile' %}">My Profile</a></li>
