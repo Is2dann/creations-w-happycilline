@@ -5,7 +5,8 @@ import stripe
 
 from django.conf import settings
 from django.contrib import messages
-from django.http import HttpResponse
+from django.contrib.auth.decorators import login_required
+from django.http import HttpResponse, Http404
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
@@ -290,6 +291,8 @@ def stripe_webhook(request):
 
         if user_profile and metadata.get('save_info') == 'true':
             p = user_profile
+            p.full_name = metadata.get('full_name', p.full_name)
+            p.email = metadata.get('email', p.email)
             p.phone_number = metadata.get('phone_number', p.phone_number)
             p.address1 = metadata.get('address1', p.address1)
             p.address2 = metadata.get('address2', p.address2)
@@ -472,3 +475,31 @@ def checkout_paid(request):
 def checkout_success(request, order_number):
     order = get_object_or_404(Order, order_number=order_number)
     return render(request, 'checkout/checkout_success.html', {'order': order})
+
+
+@login_required
+def order_detail(request, order_number):
+    """ Pulls the info for order history in My Profile menu """
+    order = get_object_or_404(
+        Order.objects.select_related('user_profile').prefetch_related(
+            'lineitems__product'),
+        order_number=order_number,
+    )
+
+    if not request.user.is_staff:
+        if not order.user_profile or order.user_profile.user_id != request.user.id:
+            raise Http404('Order not found')
+
+    items = []
+    for li in order.lineitems.all():
+        qty = li.quantity or 0
+        unit = (li.lineitem_total / qty) if qty else 0
+        items.append({
+            'product': li.product,
+            'quantity': qty,
+            'unit_price': unit,
+            'line_total': li.lineitem_total,
+        })
+
+    context = {'order': order, 'items': items}
+    return render(request, 'checkout/order_detail.html', context)
