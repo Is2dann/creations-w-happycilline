@@ -37,10 +37,16 @@
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-cwh sticky-top py-2">
         <div class="container">
-            <a href="{% url 'home' %}" class="navbar-brand d-flex align-items-center gap-2">
+            <!-- Logo only shows on larger screens, hidden on mobile -->
+            <a href="{% url 'home' %}" class="navbar-brand d-none d-lg-flex align-items-center gap-2">
                 <img src="{% static 'img/creations_w_happycilline.png' %}" alt="Creations with Happycilline logo" height="50" class="rounded-2xl">
-                <!-- A span of text in case the logo does not work -->
                 <span class="fw-semibold">Creations <span class="text-warning logo-span">with Happycilline</span></span>
+            </a>
+            <!-- Mobile only shows name on top -->
+            <a href="{% url 'home' %}" class="navbar-brand mx-auto d-lg-none text-center">
+                <span class="fw-semibold">
+                    Creations <span class="text-warning logo-span">with Happycilline</span>
+                </span>
             </a>
 
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#primaryNav" aria-controls="primaryNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -49,34 +55,54 @@
 
             <div id="primaryNav" class="collapse navbar-collapse">
                 <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                    <!-- Desktop/tablet : show a small "Hi, ..." -->
+                    {% if user.is_authenticated %}
+                        <li class="nav-item d-none d-lg-flex align-items-center me-2">
+                            <span class="navbar-text small">
+                                <i class="fa-regular fa-user me-1"></i>
+                                Hi, {{ user.first_name|default:user.username }}!
+                            </span>
+                        </li>
+                    {% endif %}
+
+                    <!-- Mobile: show the same greeting inside the collapsed menu -->
+                    {% if user.is_authenticated %}
+                        <li class="nav-item d-lg-none">
+                            <span class="nav-link disabled">
+                                <i class="fa-regular fa-user me-1"></i>
+                                Hi, {{ user.first_name|default:user.username }}!
+                            </span>
+                        </li>
+                    {% endif %}
+
                     {% if user.is_authenticated and user.is_staff %}
-                    <li class="nav-item"><a class="nav-link" href="{% url 'admin:index' %}">| Admin |</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'admin:index' %}">| Admin |</a></li>
                     {% endif %}
                     {% if user.is_authenticated %}
-                    <li class="nav-item"><a class="nav-link" href="{% url 'products:list' %}">Shop</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'products:list' %}">Shop</a></li>
                     {% else %}
-                    <li class="nav-item"><a class="nav-link" href="{% url 'products:list' %}">Browse</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'products:list' %}">Browse</a></li>
                     {% endif %}
                     {% if user.is_authenticated %}
-                    <li class="nav-item"><a class="nav-link" href="{% url 'profiles:profile' %}">My Profile</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{% url 'account_logout' %}">Sign Out</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'profiles:profile' %}">My Profile</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'account_logout' %}">Sign Out</a></li>
                     {% else %}
-                    <li class="nav-item"><a class="nav-link" href="{% url 'account_login' %}">Sign In</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{% url 'account_signup' %}">Sign Up</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'account_login' %}">Sign In</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'account_signup' %}">Sign Up</a></li>
                     {% endif %}
                     {% if user.is_authenticated %}
-                    <li class="nav-item dropdown">
-                        <a class="nav-link position-relative" href="#" id="miniBagToggle"
-                            role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            <span class="me-1">Bag</span>
-                                {% if bag_item_count %}
-                                <span class="badge bg-primary rounded-pill align-text-top">{{ bag_item_count }}</span>
-                                {% endif %}
-                        </a>
-                        <div class="dropdown-menu dropdown-menu-end p-0 shadow" aria-labelledby="miniBagToggle" style="min-width: 320px; max-width: 360px;">
-                            {% include "bag/_mini_bag.html" %}
-                        </div>
-                    </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link position-relative" href="#" id="miniBagToggle"
+                                role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <span class="me-1">Bag</span>
+                                    {% if bag_item_count %}
+                                    <span class="badge bg-primary rounded-pill align-text-top">{{ bag_item_count }}</span>
+                                    {% endif %}
+                            </a>
+                            <div class="dropdown-menu dropdown-menu-end p-0 shadow" aria-labelledby="miniBagToggle" style="min-width: 320px; max-width: 360px;">
+                                {% include "bag/_mini_bag.html" %}
+                            </div>
+                        </li>
                     {% endif %}
 
                 </ul>
