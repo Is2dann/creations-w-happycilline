@@ -16,25 +16,39 @@ def view_bag(request):
     bag = _get_bag(request.session)
     items = []
     product_ids = [int(pid) for pid in bag.keys()]
-    products = {p.id: p for p in Product.objects.filter(id__in=product_ids)}
+    products = (
+        Product.objects.filter(id__in=product_ids).prefetch_related('images')
+    )
+    products_map = {p.id: p for p in products}
 
     subtotal = Decimal('0.00')
     total_qty = 0
+
     for pid_str, qty in bag.items():
         pid = int(pid_str)
-        product = products.get(pid)
+        product = products_map.get(pid)
         if not product:
             continue
+
+        img = product.images.filter(
+            is_primary=True).first() or product.images.first()
+        image_url = getattr(getattr(img, 'image', None), 'url', None)
+        image_alt = (getattr(
+            img, 'alt_text', '') or product.name) if img else product.name
+
         qty = int(qty)
         line_total = (product.price or 0) * qty
         subtotal += line_total
         total_qty += qty
+
         items.append({
             'product': product,
             'qty': qty,
             'line_total': line_total,
+            'image_url': image_url,
+            'image_alt': image_alt,
         })
-    
+
     context = {
         'items': items,
         'total_qty': total_qty,

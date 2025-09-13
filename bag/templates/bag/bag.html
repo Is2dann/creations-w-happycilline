@@ -9,6 +9,7 @@
         <table class="table align-middle">
             <thead>
                 <tr>
+                    <th style="width: 72px;"></th>
                     <th>Product</th>
                     <th class="text-center" style="width: 140px;">Qty</th>
                     <th class="text-end">Line Total</th>
@@ -18,6 +19,12 @@
             <tbody>
                 {% for row in items %}
                 <tr>
+                    <td>
+                        <a href="{{ row.product.get_absolute_url }}" class="d-inline-block">
+                            <img src="{{ row.image_url }}" alt="{{ row.image_alt|default:row.product.name }}"
+                            class="img-thumbnail" style="width: 64px; height: 64px; object-fit: cover;">
+                        </a>
+                    </td>
                     <td>
                         <a href="{{ row.product.get_absolute_url }}">{{ row.product.name }}</a><br>
                         <small>£{{ row.product.price }}</small>
