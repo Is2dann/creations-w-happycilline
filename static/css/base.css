@@ -21,6 +21,14 @@ body {
     background: radial-gradient(1200px 1200px at 10% 10%, #534c43 0%, var(--cwh-charcoal) 35%, #413c34 100%);
 }
 
+@media (min-width: 768px) {
+    .site {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+    }
+}
+
 .logo-span {
     color: var(--cwh-gold) !important;
 }
@@ -99,7 +107,7 @@ a:hover {
 footer {
     background: var(--cwh-charcoal-2);
     color: var(--cwh-ivory);
-    border-top: 1ps solid rgba(217, 180, 122, .25);
+    border-top: 1px solid rgba(217, 180, 122, .25);
 }
 
 /* Utils */
