@@ -11,7 +11,7 @@ def send_order_confirmation(order):
     subject = render_to_string(
         'emails/order_confirmation_subject.txt', ctx).strip()
     text = render_to_string('emails/order_confirmation.txt', ctx)
-    html = render_to_string('emails/order_confirmation_subject.html', ctx)
+    html = render_to_string('emails/order_confirmation.html', ctx)
 
     msg = EmailMultiAlternatives(
         subject=subject,
