@@ -305,7 +305,7 @@ def stripe_webhook(request):
         try:
             send_order_confirmation(order)
         except Exception as e:
-            logger.info(
+            logger.exception(
                 "Order %s created; email failed: %s", order.order_number, e)
 
         logger.info(
@@ -410,6 +410,10 @@ def checkout_paid(request):
                     product=item['product'],
                     quantity=item['qty']
                 )
+            try:
+                send_order_confirmation(order)
+            except Exception as e:
+                logger.exception('Order %s created via return-url; email failed: %s', order.order_number, e)
     else:
         # Last fallback
         bag, items, order_total, delivery_cost, grand_total, _ = _bag_summary(
