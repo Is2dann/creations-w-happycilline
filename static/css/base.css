@@ -128,11 +128,12 @@ footer {
     border-radius: var(--radius);
 }
 
-/* Toasts */
-#toastContainer {
-    position: fixed;
-    top: 84px;
-    left: 18px;
-    z-index: 1080;
-    color: var(--cwh-text);
+/* Toast overlay positioning */
+#toast-stack { top: 5rem; right: 0; left: auto; }
+@media (max-width: 576px) {
+  #toast-stack {
+    top: auto; bottom: 0;
+    left: 50%; right: auto;
+    transform: translateX(-50%);
+  }
 }

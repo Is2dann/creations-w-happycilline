@@ -6,6 +6,7 @@
     <h1 class="mb-4">Your Bag</h1>
 
     {% if items %}
+    <div class="table-responsive">
         <table class="table align-middle">
             <thead>
                 <tr>
@@ -13,51 +14,69 @@
                     <th>Product</th>
                     <th class="text-center" style="width: 140px;">Qty</th>
                     <th class="text-end">Line Total</th>
-                    <th></th>
+                    <!-- hide remove column on xs -->
+                    <th class="d-none d-sm-table-cell"></th>
                 </tr>
             </thead>
+
             <tbody>
-                {% for row in items %}
+            {% for row in items %}
                 <tr>
                     <td>
                         <a href="{{ row.product.get_absolute_url }}" class="d-inline-block">
                             <img src="{{ row.image_url }}" alt="{{ row.image_alt|default:row.product.name }}"
-                            class="img-thumbnail" style="width: 64px; height: 64px; object-fit: cover;">
+                                class="img-thumbnail" style="width: 64px; height: 64px; object-fit: cover;">
                         </a>
                     </td>
                     <td>
                         <a href="{{ row.product.get_absolute_url }}">{{ row.product.name }}</a><br>
                         <small>£{{ row.product.price }}</small>
                     </td>
+
+                    <!-- Qty + mobile-only remove stacked underneath -->
                     <td class="text-center">
                         <form class="d-inline" method="POST" action="{% url 'bag:adjust_bag' row.product.id %}">
                             {% csrf_token %}
-                            <input class="form-control form-control-sm" type="number" name="quantity" value="{{ row.qty }}" min="1" style="width: 80px; display: inline-block;">
+                            <input class="form-control form-control-sm" type="number" name="quantity"
+                                value="{{ row.qty }}" min="1"
+                                style="width: 80px; display: inline-block;">
                             <button class="btn btn-sm btn-outline-secondary mt-1">Update</button>
                         </form>
+
+                        <!-- Mobile-only Remove under Update -->
+                        <form class="d-sm-none mt-2" method="POST" action="{% url 'bag:remove_from_bag' row.product.id %}">
+                            {% csrf_token %}
+                            <button class="btn btn-sm btn-outline-danger w-100">Remove</button>
+                        </form>
                     </td>
+
                     <td class="text-end">£{{ row.line_total|floatformat:2 }}</td>
-                    <td class="text-end">
+
+                    <!-- Desktop/tablet Remove button in its own column -->
+                    <td class="text-end d-none d-sm-table-cell">
                         <form class="d-inline" method="POST" action="{% url 'bag:remove_from_bag' row.product.id %}">
                             {% csrf_token %}
                             <button class="btn btn-sm btn-outline-danger">Remove</button>
                         </form>
                     </td>
                 </tr>
-                {% endfor %}
+            {% endfor %}
             </tbody>
+
             <tfoot>
                 <tr>
                     <th>Total items</th>
                     <th class="text-center">{{ total_qty }}</th>
                     <th class="text-end">£{{ subtotal|floatformat:2 }}</th>
-                    <th></th>
+                    <th class="d-none d-sm-table-cell"></th>
                 </tr>
             </tfoot>
         </table>
-        <div class="text-end">
-            <a class="btn btn-primary" href="{% url 'checkout:checkout' %}">Proceed to Checkout</a>
-        </div>
+    </div>
+
+    <div class="text-end">
+        <a class="btn btn-primary" href="{% url 'checkout:checkout' %}">Proceed to Checkout</a>
+    </div>
     {% else %}
         <p>Your bag is empty.</p>
     {% endif %}
