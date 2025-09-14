@@ -1,48 +1,105 @@
-{% extends "base.html" %}
-{% load static %}
+<!doctype html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>Order {{ order.order_number }} confirmation</title>
+        <meta name="x-apple-disable-message-reformatting">
+        <meta name="format-detection" content="telephone=no,address=no,email=no,date=no,url=no">
 
-{% block extra_css %}
-    <link rel="stylesheet" href="{% static 'checkout/css/checkout.css' %}">
-{% endblock %}
+        <style>
+            body {
+                margin:0;
+                padding:0;
+                background:#f7f7f7;
+            }
+            .wrapper {
+                max-width:640px;
+                margin:0 auto;
+                padding:24px;
+                font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+                color:#222;
+                background:#ffffff;
+            }
+            h1 {
+                margin:0 0 8px;
+                font-size:22px;
+            }
+            p {
+                margin:0 0 12px;
+            }
+            table {
+                width:100%;
+                border-collapse:collapse; 
+            }
+            th, td {
+                padding:8px 0;
+            }
+            thead th {
+                border-bottom:1px solid #ddd;
+                text-align:left;
+                font-size:14px;
+            }
+            tbody td {
+                font-size:14px;
+            }
+            tfoot td {
+                font-size:14px;
+            }
+            .right {
+                text-align:right;
+            }
+            .muted {
+                color:#666;
+                font-size:12px;
+            }
+            .totals td {
+                padding-top:10px;
+            }
+            strong {
+                font-weight:600;
+            }
+        </style>
 
-{% block content %}
+    </head>
+    <body>
+        <div class="wrapper">
+        <h1>Thank you for your order!</h1>
+        <p>Order <strong>{{ order.order_number }}</strong></p>
 
-<div style="max-width: 640px;margin: auto;padding: 24px;">
-    <h1 style="margin: 0 0 8px;">Thank you for your order!</h1>
-    <p style="margin: 0 0 16px;">Order <strong>{{ order.order_number }}</strong></p>
-    <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse: collapse;">
-        <thead>
+        <table role="presentation" aria-hidden="true">
+            <thead>
             <tr>
-                <th align="left" style="border-bottom: 1px solid #ddd; padding: 8px 0;">Item</th>
-                <th align="right" style="border-bottom: 1px solid #ddd; padding: 8px 0;">Qty</th>
-                <th align="right" style="border-bottom: 1px solid #ddd; padding: 8px 0;">Total</th>
+                <th>Item</th>
+                <th class="right">Qty</th>
+                <th class="right">Total</th>
             </tr>
-        </thead>
-        <tbody>
+            </thead>
+            <tbody>
             {% for li in items %}
             <tr>
-                <td style="padding: 6px 0;">{{ li.product.name }}</td>
-                <td align="right" style="padding: 6px 0;">{{ li.quantity }}</td>
-                <td align="right" style="padding: 6px 0;">£{{ li.lineitem_total|floatformat:2 }}</td>
+                <td>{{ li.product.name }}</td>
+                <td class="right">{{ li.quantity }}</td>
+                <td class="right">£{{ li.lineitem_total|floatformat:2 }}</td>
             </tr>
             {% endfor %}
-        </tbody>
-        <tfoot>
-            <tr>
-                <td colspan="2" align="right" style="padding-top: 10px;">Subtotal</td>
-                <td align="right" style="padding-top: 10px;">£{{ order.order_total|floatformat:2 }}</td>
+            </tbody>
+            <tfoot>
+            <tr class="totals">
+                <td colspan="2" class="right">Subtotal</td>
+                <td class="right">£{{ order.order_total|floatformat:2 }}</td>
             </tr>
             <tr>
-                <td colspan="2" align="right">Delivery</td>
-                <td align="right">£{{ order.delivery_cost|floatformat:2 }}</td>
+                <td colspan="2" class="right">Delivery</td>
+                <td class="right">£{{ order.delivery_cost|floatformat:2 }}</td>
             </tr>
             <tr>
-                <td colspan="2" align="right"><strong>Total</strong></td>
-                <td align="right"><strong>£{{ order.grand_total|floatformat:2 }}</strong></td>
+                <td colspan="2" class="right"><strong>Total</strong></td>
+                <td class="right"><strong>£{{ order.grand_total|floatformat:2 }}</strong></td>
             </tr>
-        </tfoot>
-    </table>
-    <p style="margin-top: 24px; color: #555; font-size: 14px;">Questions? Reply to this email.</p>
-</div>
+            </tfoot>
+        </table>
 
-{% endblock %}
+        <p class="muted" style="margin-top:16px;">Questions? Reply to this email.</p>
+        </div>
+    </body>
+</html>
