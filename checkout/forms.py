@@ -11,12 +11,16 @@ class OrderForm(forms.ModelForm):
             'county', 'postcode', 'country',
         ]
         widgets = {
-            'full_name': forms.TextInput(attrs={'placeholder': 'Your full name'}),
-            'email': forms.EmailInput(attrs={'placeholder': 'you@example.com'}),
+            'full_name': forms.TextInput(
+                attrs={'placeholder': 'Your full name'}),
+            'email': forms.EmailInput(
+                attrs={'placeholder': 'you@example.com'}),
             'phone_number': forms.TextInput(attrs={'placeholder': 'Optional'}),
             'address1': forms.TextInput(attrs={'placeholder': 'House/Street'}),
-            'address2': forms.TextInput(attrs={'placeholder': 'Apartment, suite, etc (optional)'}),
+            'address2': forms.TextInput(
+                attrs={'placeholder': 'Apartment, suite, etc (optional)'}),
             'city': forms.TextInput(attrs={'placeholder': 'City/Town'}),
-            'county': forms.TextInput(attrs={'placeholder': 'County/State (optional)'}),
+            'county': forms.TextInput(
+                attrs={'placeholder': 'County/State (optional)'}),
             'postcode': forms.TextInput(attrs={'placeholder': 'Postcode/ZIP'}),
         }

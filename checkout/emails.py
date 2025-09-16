@@ -34,14 +34,16 @@ def send_order_confirmation(order):
              ], ctx
         ) or (
             "Hi {name}\n\nThanks for your order {num}.\nTotal: £{tot:.2f}\n".format(
-                name=order.full_name, num=order.order_number, tot=order.grand_total)
+                name=order.full_name,
+                num=order.order_number,
+                tot=order.grand_total)
             )
     )
 
     html = _render_first(
         ["emails/order_confirmation.html",
          "checkout/emails/order_confirmation.html",
-        ], ctx)
+         ], ctx)
 
     msg = EmailMultiAlternatives(
         subject=subject,

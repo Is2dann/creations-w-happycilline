@@ -13,7 +13,7 @@ class StripeFlowTests(TestCase):
     def test_checkout_paid_creates_order(self, mock_stripe):
         # Mock PI retrieve to return succeeded
         mock_stripe.PaymentIntent.retrieve.return_value = type(
-            'PI', (), {'id':'pi_123', 'status':'succeeded'})
+            'PI', (), {'id': 'pi_123', 'status': 'succeeded'})
         p = Product.objects.create(name='X', price=Decimal('10.00'))
         s = self.client.session
         s['bag'] = {str(p.id): 2}
@@ -30,11 +30,17 @@ class StripeFlowTests(TestCase):
             'save_info': False
         }
         s.save()
-        r = self.client.get(reverse('checkout:checkout_paid') + '?payment_intent_client_secret=pi_123_secret_abc')
+        r = self.client.get(
+            reverse(
+                'checkout:checkout_paid'
+            ) + '?payment_intent_client_secret=pi_123_secret_abc'
+        )
         self.assertEqual(r.status_code, 302)
 
 
-@override_settings(EMAIL_BACKEND='django.core.mail.backends.locmem.EmailBackend')
+@override_settings(
+    EMAIL_BACKEND='django.core.mail.backends.locmem.EmailBackend'
+)
 class EmailTests(TestCase):
     def test_order_mail(self):
         p = Product.objects.create(name='X', price=Decimal('10.00'))

@@ -3,8 +3,7 @@
         {% for it in mini_bag_items %}
             <div class="d-flex align-items-center gap-2 mb-2">
                 {% if it.thumb_url %}
-                <img src="{{ it.thumb_url }}" alt="{{ it.name }}" class="rounded"
-                    style="width:48px;height:48px;object-fit:cover;">
+                <img src="{{ it.thumb_url }}" alt="{{ it.name }}" class="rounded mini-bag-image">
                 {% endif %}
                 <div class="flex-grow-1">
                     <div class="fw-semibold small">

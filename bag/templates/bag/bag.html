@@ -10,9 +10,9 @@
         <table class="table align-middle">
             <thead>
                 <tr>
-                    <th style="width: 72px;"></th>
+                    <th class="w72"></th>
                     <th>Product</th>
-                    <th class="text-center" style="width: 140px;">Qty</th>
+                    <th class="text-center w140">Qty</th>
                     <th class="text-end">Line Total</th>
                     <!-- hide remove column on xs -->
                     <th class="d-none d-sm-table-cell"></th>
@@ -25,7 +25,7 @@
                     <td>
                         <a href="{{ row.product.get_absolute_url }}" class="d-inline-block">
                             <img src="{{ row.image_url }}" alt="{{ row.image_alt|default:row.product.name }}"
-                                class="img-thumbnail" style="width: 64px; height: 64px; object-fit: cover;">
+                                class="img-thumbnail bag-image">
                         </a>
                     </td>
                     <td>
@@ -37,9 +37,8 @@
                     <td class="text-center">
                         <form class="d-inline" method="POST" action="{% url 'bag:adjust_bag' row.product.id %}">
                             {% csrf_token %}
-                            <input class="form-control form-control-sm" type="number" name="quantity"
-                                value="{{ row.qty }}" min="1"
-                                style="width: 80px; display: inline-block;">
+                            <input class="form-control form-control-sm bag-form" type="number" name="quantity"
+                                value="{{ row.qty }}" min="1">
                             <button class="btn btn-sm btn-outline-secondary mt-1">Update</button>
                         </form>
 

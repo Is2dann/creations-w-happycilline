@@ -6,7 +6,7 @@ from products.models import Product
 class BagViewTests(TestCase):
     """ This testcase is from Django documentation,
         just tweaked to my purpose """
-    
+
     """ Gets Test Item with a price of £10 """
     def setUp(self):
         self.p = Product.objects.create(name='Test Item', price=10)

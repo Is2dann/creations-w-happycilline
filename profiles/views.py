@@ -3,6 +3,7 @@ from django.contrib import messages
 from django.shortcuts import render, redirect
 from .forms import UserProfileForm
 
+
 @login_required
 def profile(request):
     profile = request.user.userprofile

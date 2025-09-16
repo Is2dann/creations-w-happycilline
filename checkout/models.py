@@ -47,7 +47,8 @@ class Order(models.Model):
 
     def update_totals(self):
         self.order_total = sum(
-            item.lineitem_total for item in self.lineitems.all()) or Decimal('0.00')
+            item.lineitem_total for item in self.lineitems.all()
+        ) or Decimal('0.00')
         if self.order_total >= FREE_DELIVERY_THRESHOLD:
             self.delivery_cost = Decimal('0.00')
         else:

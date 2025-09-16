@@ -6,11 +6,11 @@
   <div class="row g-4">
     <div class="col-md-6">
       {% if primary_image %}
-        <button type="button" class="p-0 border-0 bg-transparent w-100" data-bs-toggle="modal" data-bs-target="#imageModal" data-idx="0" aria-label="Open main image of {{ product.name }}" style="cursor:pointer">
-          <img id="mainImage" class="img-fluid rounded shadow-cwh w-100" src="{{ primary_image.image.url }}" alt="{{ primary_image.alt_text|default:product.name }}" style="max-height: 520px; object-fit: cover;">
+        <button type="button" class="p-0 border-0 bg-transparent w-100 pointer" data-bs-toggle="modal" data-bs-target="#imageModal" data-idx="0" aria-label="Open main image of {{ product.name }}">
+          <img id="mainImage" class="img-fluid rounded shadow-cwh w-100 prod-image" src="{{ primary_image.image.url }}" alt="{{ primary_image.alt_text|default:product.name }}">
         </button>
       {% else %}
-        <div class="bg-light border rounded d-flex align-items-center justify-content-center" style="height: 360px;">
+        <div class="bg-light border rounded d-flex align-items-center justify-content-center h-360">
           <span class="text-muted">No Image</span>
         </div>
       {% endif %}
@@ -18,8 +18,8 @@
       {% if gallery %}
         <div class="d-flex gap-2 mt-3 flex-wrap">
           {% for img in gallery %}
-            <button type="button" class="btn p-0 border-0" data-bs-toggle="modal" data-bs-target="#imageModal" data-idx="{{ forloop.counter0|add:1 }}" aria-label="Open image of {{ img.alt_text|default:product.name }}" style="cursor:pointer">
-              <img class="img-thumbnail rounded" src="{{ img.image.url }}" alt="{{ img.alt_text|default:product.name }}" style="width: 88px; height: 88px; object-fit: cover;" loading="lazy">
+            <button type="button" class="btn p-0 border-0 pointer" data-bs-toggle="modal" data-bs-target="#imageModal" data-idx="{{ forloop.counter0|add:1 }}" aria-label="Open image of {{ img.alt_text|default:product.name }}">
+              <img class="img-thumbnail rounded thumbnail-image" src="{{ img.image.url }}" alt="{{ img.alt_text|default:product.name }}" loading="lazy">
             </button>
           {% endfor %}
         </div>
@@ -38,7 +38,7 @@
       <form class="d-flex gap-2 align-items-center" method="POST" action="{% url 'bag:add_to_bag' product.id %}">
         {% csrf_token %}
         <label for="id_qty" class="mb-0">Qty</label>
-        <input class="form-control" type="number" name="quantity" id="id_qty" value="1" min="1" style="max-width: 120px;">
+        <input class="form-control mw-120" type="number" name="quantity" id="id_qty" value="1" min="1">
         <input type="hidden" name="redirect_url" value="{{ request.path }}">
         <button class="btn btn-success" type="submit">Add to Bag</button>
       </form>
@@ -69,7 +69,7 @@
       </div>
 
       <div class="modal-body p-0 position-relative">
-        <img id="imageModalFull" src="" alt="" class="w-100" style="max-height: 85vh; object-fit: contain;">
+        <img id="imageModalFull" src="" alt="" class="w-100 full-modal">
 
         <!-- Prev/Next controls -->
         <button type="button" id="prevBtn" class="btn btn-cwh-outline position-absolute top-50 start-0 translate-middle-y ms-2" aria-label="Previous image">
@@ -90,56 +90,6 @@
 {% endblock %}
 
 {% block extra_js %}
-<script>
-  // galleryData comes directly from context as JSON
-  const galleryData = {{ gallery_js|safe }};
-  
-  const modalEl = document.getElementById('imageModal');
-  const modalImg = document.getElementById('imageModalFull');
-  const counter = document.getElementById('imageCounter');
-  const prevBtn = document.getElementById('prevBtn');
-  const nextBtn = document.getElementById('nextBtn');
-  let currentIdx = 0;
-
-  function showImage(idx) {
-    if (!galleryData.length) return;
-    if (idx < 0) idx = galleryData.length - 1;
-    if (idx >= galleryData.length) idx = 0;
-    currentIdx = idx;
-    const item = galleryData[currentIdx];
-    if (modalImg) {
-      modalImg.src = item.url;
-      modalImg.alt = item.alt || "";
-    }
-    if (counter) {
-      counter.textContent = (currentIdx + 1) + " / " + galleryData.length;
-    }
-  }
-
-  document.addEventListener('click', (e) => {
-    const trigger = e.target.closest('[data-bs-target="#imageModal"][data-idx]');
-    if (!trigger) return;
-    const idx = parseInt(trigger.getAttribute('data-idx'), 10) || 0;
-    showImage(idx);
-  });
-
-  prevBtn?.addEventListener('click', () => showImage(currentIdx - 1));
-  nextBtn?.addEventListener('click', () => showImage(currentIdx + 1));
-
-  modalEl?.addEventListener('shown.bs.modal', () => {
-    const onKey = (ev) => {
-      if (ev.key === 'ArrowLeft') showImage(currentIdx - 1);
-      if (ev.key === 'ArrowRight') showImage(currentIdx + 1);
-    };
-    document.addEventListener('keydown', onKey);
-    modalEl.addEventListener('hidden.bs.modal', () => {
-      document.removeEventListener('keydown', onKey);
-      if (modalImg) {
-        modalImg.removeAttribute('src');
-        modalImg.removeAttribute('alt');
-      }
-    }, { once: true });
-  });
-</script>
+<script  src="{% static 'js/product_detail.js' %}"></script>
 {% endblock %}
 

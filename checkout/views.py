@@ -71,7 +71,9 @@ def _bag_summary(request):
         if order_total < FREE_DELIVERY_THRESHOLD
         else Decimal('0.00')
     )
-    return bag, items, order_total, delivery_cost, grand_total, remaining_to_free
+    return (bag, items,
+            order_total, delivery_cost,
+            grand_total, remaining_to_free)
 
 
 def _summary_from_bag_dict(bag_dict):
@@ -120,7 +122,8 @@ def checkout(request):
     """
     stripe.api_key = settings.STRIPE_SECRET_KEY
 
-    bag, items, order_total, delivery_cost, grand_total, remaining_to_free = _bag_summary(request)
+    (bag, items, order_total,
+     delivery_cost, grand_total, remaining_to_free) = _bag_summary(request)
     if not bag:
         messages.info(request, "Your bag is empty.")
         return redirect('bag:view_bag')
@@ -257,7 +260,8 @@ def stripe_webhook(request):
             bag = json.loads(metadata.get('bag', '{}'))
         except Exception:
             bag = {}
-        items, order_total, delivery_cost, grand_total = _summary_from_bag_dict(bag)
+        (items, order_total,
+         delivery_cost, grand_total) = _summary_from_bag_dict(bag)
 
         user_profile = None
         profile_id = metadata.get('profile_id')
@@ -373,7 +377,8 @@ def checkout_paid(request):
 
     if bag_from_meta:
         # Use metadata (preferred)
-        items, order_total, delivery_cost, grand_total = _summary_from_bag_dict(
+        (items, order_total,
+         delivery_cost, grand_total) = _summary_from_bag_dict(
             bag_from_meta
         )
         user_profile = None
@@ -413,7 +418,10 @@ def checkout_paid(request):
             try:
                 send_order_confirmation(order)
             except Exception as e:
-                logger.exception('Order %s created via return-url; email failed: %s', order.order_number, e)
+                logger.exception(
+                    'Order %s created via return-url; email failed:'
+                    '%s', order.order_number, e
+                )
     else:
         # Last fallback
         bag, items, order_total, delivery_cost, grand_total, _ = _bag_summary(
@@ -423,7 +431,7 @@ def checkout_paid(request):
         if not bag or not data:
             messages.info(
                 request,
-                "Payment received. We're finalising your order;" \
+                "Payment received. We're finalising your order;"
                 "it will appear in your profile shortly."
             )
             request.session['bag'] = {}

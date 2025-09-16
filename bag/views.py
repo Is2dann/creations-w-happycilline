@@ -72,10 +72,15 @@ def add_to_bag(request, item_id):
     bag[key] = bag.get(key, 0) + qty
     request.session['bag'] = bag
 
-    messages.success(request, f'Added {qty} x {product.name} to your shopping bag.')
+    messages.success(
+        request, f'Added {qty} x {
+            product.name} to your shopping bag.'
+    )
 
-    # Redirect back to the page we came from (code from Stackoverflow (tweaked))
-    redirect_url = request.POST.get('redirect_url') or request.META.get('HTTP_REFERER') or 'bag:view_bag'
+    # Redirect back to the page we came from
+    # (code from Stackoverflow (tweaked))
+    redirect_url = request.POST.get(
+        'redirect_url') or request.META.get('HTTP_REFERER') or 'bag:view_bag'
     return redirect(redirect_url)
 
 
@@ -96,7 +101,10 @@ def adjust_bag(request, item_id):
     else:
         removed = bag.pop(key, None)
         if removed:
-            messages.info(request, f'Removed {qty} x {product.name} from your shopping bag.')
+            messages.info(
+                request, f'Removed {qty} x {
+                    product.name} from your shopping bag.'
+            )
 
     request.session['bag'] = bag
     return redirect('bag:view_bag')
@@ -110,7 +118,10 @@ def remove_from_bag(request, item_id):
 
     if key in bag:
         bag.pop(key)
-        messages.warning(request, f'Removed {product.name} from your shopping bag.')
+        messages.warning(
+            request, f'Removed {
+                product.name} from your shopping bag.'
+        )
         request.session['bag'] = bag
 
     return redirect('bag:view_bag')

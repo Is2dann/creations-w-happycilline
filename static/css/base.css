@@ -137,3 +137,64 @@ footer {
     transform: translateX(-50%);
   }
 }
+
+/* other css */
+.w72 {
+    width: 72px;
+}
+.w90 {
+    width: 90px;
+}
+.w120 {
+    width: 120px;
+}
+.mw-120 {
+    max-width: 120px;
+}
+.w140 {
+   width: 140px;
+}
+
+.bag-image {
+    width: 64px; height: 64px; object-fit: cover;
+}
+
+.bag-form {
+    width: 80px; display: inline-block;
+}
+
+.mini-bag-image {
+    width:48px;height:48px;object-fit:cover;
+}
+
+.display-none {
+    display: none;
+}
+
+.pointer {
+    cursor: pointer;
+}
+
+.prod-image {
+    max-height: 520px; object-fit: cover;
+}
+
+.h-360 {
+    height: 360px;
+} 
+
+.thumbnail-image {
+    width: 88px; height: 88px; object-fit: cover;
+}
+
+.full-modal {
+    max-height: 85vh; object-fit: contain;
+}
+
+.pc-image {
+    height: 220px; object-fit: cover;
+}
+
+.pcm-image {
+    max-height: 75vh; object-fit: contain;
+}
