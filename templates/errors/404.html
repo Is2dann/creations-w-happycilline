@@ -3,8 +3,8 @@
 {% block content %}
     <div class="text-center py-5">
         <h1 class="display-6">Oopsie! We couldn't find that page.</h1>
-        <p class="text-muted">Try the links below to get back on track.</p>
-        <a class="btn btn-outline-primary" href="{% url 'home' %}">Go to Home</a>
-        <a class="btn btn-link" href="/cms/faq/">Read FAQs</a>
+        <p>Try the links below to get back on track.</p>
+        <a class="btn btn-outline-primary btn-cwh" href="{% url 'home' %}">Go to Home</a>
+        <a class="nav-link px-0" href="{% url 'policies:faqs' %}">Read FAQs</a>
     </div>
 {% endblock %}
