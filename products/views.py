@@ -6,7 +6,7 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from django.urls import reverse
 
 from .models import Category, Product, Wishlist, ProductReview
-from .forms import ProductForm, ProductReviewForm
+from .forms import ProductForm, ProductReviewForm, ProductImageFormSet
 
 # Map UI sort values to queryset order_by
 SORT_MAP = {
@@ -247,55 +247,84 @@ def admin_product_list(request):
 @user_passes_test(_is_staff_user)
 def product_create(request):
     """
-    Create a new product via the UI.
+    Create a new product via the UI, including images.
     Staff/superusers only.
     """
+    product = Product()
+
     if request.method == "POST":
-        form = ProductForm(request.POST)
-        if form.is_valid():
+        form = ProductForm(request.POST, instance=product)
+        formset = ProductImageFormSet(
+            request.POST,
+            request.FILES,
+            instance=product,
+        )
+
+        if form.is_valid() and formset.is_valid():
             product = form.save()
+            # instance already bound; just save related images
+            formset.save()
             messages.success(
                 request,
                 f'Product "{product.name}" created successfully.',
             )
-            return redirect('products:admin_product_list')
+            return redirect("products:admin_product_list")
     else:
         form = ProductForm()
+        formset = ProductImageFormSet(instance=product)
 
-    return render(request, 'products/admin/product_form.html', {
-        'form': form,
-        'title': 'Add Product',
-        'submit_label': 'Create Product',
-    })
+    return render(
+        request,
+        "products/admin/product_form.html",
+        {
+            "form": form,
+            "formset": formset,
+            "title": "Add Product",
+            "submit_label": "Create Product",
+        },
+    )
 
 
 @login_required
 @user_passes_test(_is_staff_user)
 def product_update(request, pk):
     """
-    Update an existing product.
+    Update an existing product, including its images.
     Staff/superusers only.
     """
     product = get_object_or_404(Product, pk=pk)
 
     if request.method == "POST":
         form = ProductForm(request.POST, instance=product)
-        if form.is_valid():
+        formset = ProductImageFormSet(
+            request.POST,
+            request.FILES,
+            instance=product,
+        )
+
+        if form.is_valid() and formset.is_valid():
             product = form.save()
+            formset.save()
             messages.success(
                 request,
                 f'Product "{product.name}" updated successfully.',
             )
-            return redirect('products:admin_product_list')
+            return redirect("products:admin_product_list")
     else:
         form = ProductForm(instance=product)
+        formset = ProductImageFormSet(instance=product)
 
-    return render(request, 'products/admin/product_form.html', {
-        'form': form,
-        'title': 'Edit Product',
-        'submit_label': 'Save Changes',
-        'product': product,
-    })
+    return render(
+        request,
+        "products/admin/product_form.html",
+        {
+            "form": form,
+            "formset": formset,
+            "title": "Edit Product",
+            "submit_label": "Save Changes",
+            "product": product,
+        },
+    )
 
 
 @login_required

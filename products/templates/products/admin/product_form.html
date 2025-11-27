@@ -7,14 +7,26 @@
     <h1 class="h3 mb-3">{{ title }}</h1>
 
     <div class="card card-cwh p-3 p-md-4">
-        <form method="post" novalidate>
+        <form method="post" novalidate enctype="multipart/form-data">
             {% csrf_token %}
+
+            {# Global error banner #}
+            {% if form.errors or formset.non_form_errors or formset.errors %}
+                <div class="alert alert-danger">
+                    <strong>There were some problems with your submission.</strong>
+                    <div class="small mt-1">
+                        Please review the highlighted fields below and try again.
+                    </div>
+                </div>
+            {% endif %}
+
             {% if form.non_field_errors %}
                 <div class="alert alert-danger">
                     {{ form.non_field_errors }}
                 </div>
             {% endif %}
 
+            {# Main product fields #}
             {% for field in form %}
                 <div class="mb-3">
                     <label class="form-label" for="{{ field.id_for_label }}">
@@ -33,7 +45,87 @@
                 </div>
             {% endfor %}
 
-            <div class="d-flex justify-content-between align-items-center">
+            {# Images formset (optional) #}
+            {% if formset %}
+                <hr class="my-4">
+
+                <h2 class="h5 mb-2">Images</h2>
+                <p class="small text-muted mb-3">
+                    Upload one or more images for this product. Mark one as
+                    <strong>primary</strong> to control which image appears first
+                    in the shop and admin lists.
+                </p>
+
+                {% if formset.non_form_errors %}
+                    <div class="alert alert-danger">
+                        {% for error in formset.non_form_errors %}
+                            <div>{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                {{ formset.management_form }}
+
+                <div class="vstack gap-3">
+                    {% for f in formset %}
+                        <div class="border rounded p-3 bg-dark bg-opacity-25">
+                            {% if f.non_field_errors %}
+                                <div class="alert alert-danger mb-2 py-1 small">
+                                    {% for error in f.non_field_errors %}
+                                        <div>{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+
+                            {% if f.instance.pk and f.instance.image %}
+                                <div class="mb-2 d-flex align-items-center gap-3">
+                                    <img
+                                        src="{{ f.instance.image.url }}"
+                                        alt="{{ f.instance.alt_text|default:'Product image' }}"
+                                        class="mini-bag-image rounded"
+                                    >
+                                    <span class="small text-muted">Existing image</span>
+                                </div>
+                            {% endif %}
+
+                            <div class="row g-2">
+                                <div class="col-md-6">
+                                    {{ f.image.label_tag }}{{ f.image }}
+                                    {% for error in f.image.errors %}
+                                        <div class="text-danger small">{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                                <div class="col-md-4">
+                                    {{ f.alt_text.label_tag }}{{ f.alt_text }}
+                                    {% for error in f.alt_text.errors %}
+                                        <div class="text-danger small">{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                                <div class="col-md-1">
+                                    {{ f.sort_order.label_tag }}{{ f.sort_order }}
+                                    {% for error in f.sort_order.errors %}
+                                        <div class="text-danger small">{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                                <div class="col-md-1">
+                                    {{ f.is_primary.label_tag }}{{ f.is_primary }}
+                                    {% for error in f.is_primary.errors %}
+                                        <div class="text-danger small">{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+
+                            {% if f.DELETE %}
+                                <div class="form-check mt-2">
+                                    {{ f.DELETE }} {{ f.DELETE.label_tag }}
+                                </div>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <div class="d-flex justify-content-between align-items-center mt-4">
                 <a href="{% url 'products:admin_product_list' %}" class="btn btn-outline-secondary">
                     Cancel
                 </a>
