@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Category, Product, ProductImage
+from .models import Category, Product, ProductImage, Wishlist, ProductReview
 
 
 class ProductImageInLine(admin.TabularInline):
@@ -22,3 +22,19 @@ class ProductAdmin(admin.ModelAdmin):
     search_fields = ('name', 'sku')
     inlines = [ProductImageInLine]
     prepopulated_fields = {'slug': ('name',)}
+
+
+@admin.register(Wishlist)
+class WishlistAdmin(admin.ModelAdmin):
+    list_display = ('user', 'product', 'created_at')
+    list_filter = ('user', 'product')
+    search_fields = ('user__username', 'product__name')
+    ordering = ('-created_at',)
+
+
+@admin.register(ProductReview)
+class ProductReviewAdmin(admin.ModelAdmin):
+    list_display = ('product', 'user', 'rating', 'approved', 'created_at')
+    list_filter = ('rating', 'approved', 'product')
+    search_fields = ('user__username', 'product__name', 'title')
+    ordering = ('-created_at',)

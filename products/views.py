@@ -1,7 +1,12 @@
 from django.core.paginator import Paginator
-from django.db.models import Q, Count
-from django.shortcuts import render, get_object_or_404
-from .models import Category, Product
+from django.db.models import Q, Count, Avg
+from django.shortcuts import render, get_object_or_404, redirect
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required, user_passes_test
+from django.urls import reverse
+
+from .models import Category, Product, Wishlist, ProductReview
+from .forms import ProductForm, ProductReviewForm
 
 # Map UI sort values to queryset order_by
 SORT_MAP = {
@@ -19,7 +24,11 @@ def category_list(request):
     categories = (
         Category.objects.filter(is_active=True)
         .annotate(
-            product_count=Count("product", filter=Q(product__is_active=True)))
+            product_count=Count(
+                "product",
+                filter=Q(product__is_active=True),
+            )
+        )
         .order_by("sort_order", "name")
     )
     latest_products = (
@@ -124,11 +133,13 @@ def product_list(request):
 def product_detail(request, slug):
     product = get_object_or_404(
         Product.objects.prefetch_related('images', 'category'),
-        slug=slug, is_active=True
+        slug=slug,
+        is_active=True,
     )
     # This picks primary image or first as fallback
     primary = product.images.filter(
-        is_primary=True).first() or product.images.first()
+        is_primary=True,
+    ).first() or product.images.first()
     gallery = list(product.images.all())
 
     gallery_js = []
@@ -144,9 +155,230 @@ def product_detail(request, slug):
                 'alt': img.alt_text or product.name,
             })
 
+    # Wishlist info
+    in_wishlist = False
+    if request.user.is_authenticated:
+        in_wishlist = Wishlist.objects.filter(
+            user=request.user,
+            product=product,
+        ).exists()
+
+    # Reviews + average rating
+    reviews = product.reviews.filter(approved=True)
+    average_rating = reviews.aggregate(avg=Avg('rating'))['avg']
+
+    user_review = None
+    if request.user.is_authenticated:
+        user_review = reviews.filter(user=request.user).first()
+
     return render(request, 'products/product_detail.html', {
         'product': product,
         'primary_image': primary,
         'gallery': gallery,
         'gallery_js': gallery_js,
+        'in_wishlist': in_wishlist,
+        'reviews': reviews,
+        'average_rating': average_rating,
+        'user_review': user_review,
+    })
+
+
+# -------------------------------------------------------------------
+# Admin-only Product CRUD views (UI-based)
+# -------------------------------------------------------------------
+
+
+def _is_staff_user(user):
+    return user.is_active and user.is_staff
+
+
+@login_required
+@user_passes_test(_is_staff_user)
+def admin_product_list(request):
+    """
+    Admin-facing list of all products, with links to edit/delete.
+    """
+    products = (
+        Product.objects.all()
+        .select_related('category')
+        .order_by('name')
+    )
+    return render(request, 'products/admin/product_admin_list.html', {
+        'products': products,
+    })
+
+
+@login_required
+@user_passes_test(_is_staff_user)
+def product_create(request):
+    """
+    Create a new product via the UI.
+    Staff/superusers only.
+    """
+    if request.method == "POST":
+        form = ProductForm(request.POST)
+        if form.is_valid():
+            product = form.save()
+            messages.success(
+                request,
+                f'Product "{product.name}" created successfully.',
+            )
+            return redirect('products:admin_product_list')
+    else:
+        form = ProductForm()
+
+    return render(request, 'products/admin/product_form.html', {
+        'form': form,
+        'title': 'Add Product',
+        'submit_label': 'Create Product',
+    })
+
+
+@login_required
+@user_passes_test(_is_staff_user)
+def product_update(request, pk):
+    """
+    Update an existing product.
+    Staff/superusers only.
+    """
+    product = get_object_or_404(Product, pk=pk)
+
+    if request.method == "POST":
+        form = ProductForm(request.POST, instance=product)
+        if form.is_valid():
+            product = form.save()
+            messages.success(
+                request,
+                f'Product "{product.name}" updated successfully.',
+            )
+            return redirect('products:admin_product_list')
+    else:
+        form = ProductForm(instance=product)
+
+    return render(request, 'products/admin/product_form.html', {
+        'form': form,
+        'title': 'Edit Product',
+        'submit_label': 'Save Changes',
+        'product': product,
+    })
+
+
+@login_required
+@user_passes_test(_is_staff_user)
+def product_delete(request, pk):
+    """
+    Delete a product after confirmation.
+    Staff/superusers only.
+    """
+    product = get_object_or_404(Product, pk=pk)
+
+    if request.method == "POST":
+        name = product.name
+        product.delete()
+        messages.success(
+            request,
+            f'Product "{name}" deleted successfully.',
+        )
+        return redirect('products:admin_product_list')
+
+    return render(request, 'products/admin/product_confirm_delete.html', {
+        'product': product,
+    })
+
+
+# -------------------------------------------------------------------
+# Wishlist views
+# -------------------------------------------------------------------
+
+
+@login_required
+def wishlist_list(request):
+    """
+    Show the logged-in user's wishlist items.
+    """
+    items = (
+        Wishlist.objects.filter(user=request.user)
+        .select_related('product', 'product__category')
+        .order_by('-created_at')
+    )
+    return render(request, 'products/wishlist.html', {
+        'items': items,
+    })
+
+
+@login_required
+def wishlist_toggle(request, product_id):
+    """
+    Toggle product in the user's wishlist.
+    POST only.
+    """
+    product = get_object_or_404(Product, pk=product_id, is_active=True)
+
+    wishlist_qs = Wishlist.objects.filter(
+        user=request.user,
+        product=product,
+    )
+
+    if wishlist_qs.exists():
+        wishlist_qs.delete()
+        messages.info(
+            request,
+            f'"{product.name}" removed from your wishlist.',
+        )
+    else:
+        Wishlist.objects.create(user=request.user, product=product)
+        messages.success(
+            request,
+            f'"{product.name}" added to your wishlist.',
+        )
+
+    redirect_url = request.POST.get('redirect_url')
+    if redirect_url:
+        return redirect(redirect_url)
+    return redirect('products:detail', slug=product.slug)
+
+
+# -------------------------------------------------------------------
+# Product review views
+# -------------------------------------------------------------------
+
+
+@login_required
+def product_review(request, slug):
+    """
+    Create or update the logged-in user's review for a product.
+    """
+    product = get_object_or_404(Product, slug=slug, is_active=True)
+
+    # Get existing review by this user if it exists
+    existing_review = ProductReview.objects.filter(
+        product=product,
+        user=request.user,
+    ).first()
+
+    if request.method == "POST":
+        form = ProductReviewForm(request.POST, instance=existing_review)
+        if form.is_valid():
+            review = form.save(commit=False)
+            review.product = product
+            review.user = request.user
+            review.save()
+            if existing_review:
+                messages.success(
+                    request,
+                    'Your review has been updated.',
+                )
+            else:
+                messages.success(
+                    request,
+                    'Thank you for reviewing this product!',
+                )
+            return redirect('products:detail', slug=product.slug)
+    else:
+        form = ProductReviewForm(instance=existing_review)
+
+    return render(request, 'products/product_review_form.html', {
+        'product': product,
+        'form': form,
+        'existing_review': existing_review,
     })

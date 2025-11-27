@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+
+{% block title %}Product Management | Creations with Happycilline{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <h1 class="h3 mb-1">Product Management</h1>
+            <p class="mb-0 small text-muted">
+                Manage the products shown in the shop. Only staff can see this page.
+            </p>
+        </div>
+        <div>
+            <a href="{% url 'products:product_create' %}" class="btn btn-cwh">
+                + Add Product
+            </a>
+        </div>
+    </div>
+
+    {% if products %}
+        <div class="card card-cwh p-3">
+            <div class="table-responsive">
+                <table class="table align-middle mb-0 text-light">
+                    <thead>
+                        <tr>
+                            <th scope="col">Name</th>
+                            <th scope="col">Category</th>
+                            <th scope="col">Price</th>
+                            <th scope="col">Active</th>
+                            <th scope="col">Created</th>
+                            <th scope="col">Updated</th>
+                            <th scope="col" class="text-end">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for product in products %}
+                            <tr>
+                                <td>
+                                    <a href="{% url 'products:detail' product.slug %}" class="text-decoration-none">
+                                        {{ product.name }}
+                                    </a>
+                                </td>
+                                <td>{{ product.category|default:"—" }}</td>
+                                <td>£{{ product.price|floatformat:2 }}</td>
+                                <td>
+                                    {% if product.is_active %}
+                                        <span class="badge bg-success">Active</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">Hidden</span>
+                                    {% endif %}
+                                </td>
+                                <td class="small text-muted">
+                                    {{ product.created_at|date:"Y-m-d H:i" }}
+                                </td>
+                                <td class="small text-muted">
+                                    {{ product.updated_at|date:"Y-m-d H:i" }}
+                                </td>
+                                <td class="text-end">
+                                    <a href="{% url 'products:product_update' product.pk %}"
+                                       class="btn btn-sm btn-cwh-outline me-1">
+                                        Edit
+                                    </a>
+                                    <a href="{% url 'products:product_delete' product.pk %}"
+                                       class="btn btn-sm btn-outline-danger">
+                                        Delete
+                                    </a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    {% else %}
+        <div class="alert alert-info">
+            There are no products yet. Use the <strong>Add Product</strong> button to create one.
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

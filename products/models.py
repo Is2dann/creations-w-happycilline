@@ -1,5 +1,9 @@
+from django.conf import settings
 from django.db import models
 from django.utils.text import slugify
+
+
+RATING_CHOICES = [(i, i) for i in range(1, 6)]
 
 
 class Category(models.Model):
@@ -67,3 +71,53 @@ class ProductImage(models.Model):
 
     def __str__(self):
         return f'{self.product.name} image #{self.pk}'
+    
+
+class Wishlist(models.Model):
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='wishlist_items',
+    )
+    product = models.ForeignKey(
+        'Product',
+        on_delete=models.CASCADE,
+        related_name='wishlisted_by',
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('user', 'product')
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f'{self.user} → {self.product}'
+    
+
+class ProductReview(models.Model):
+    product = models.ForeignKey(
+        'Product',
+        on_delete=models.CASCADE,
+        related_name='reviews',
+    )
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='product_reviews',
+    )
+    rating = models.PositiveSmallIntegerField(choices=RATING_CHOICES)
+    title = models.CharField(max_length=100, blank=True)
+    body = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    approved = models.BooleanField(default=True)
+
+    class Meta:
+        ordering = ['-created_at']
+        unique_together = ('product', 'user')
+
+    def __str__(self):
+        return (
+            f'Review {self.rating}/5 on {self.product} by '
+            f'{self.user}'
+        )

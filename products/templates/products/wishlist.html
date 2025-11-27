@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% block title %}My Wishlist | Creations with Happycilline{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h1 class="h3 mb-0">My Wishlist</h1>
+        <p class="mb-0 small text-muted">
+            Products you've saved for later.
+        </p>
+    </div>
+
+    {% if items %}
+        <div class="row g-3">
+            {% for item in items %}
+                <div class="col-12 col-md-6 col-lg-4">
+                    <div class="card card-cwh h-100 p-3 d-flex flex-row gap-3">
+                        <div class="w72 flex-shrink-0">
+                            {% with primary=item.product.images.all.0 %}
+                                {% if primary %}
+                                    <img src="{{ primary.image.url }}"
+                                         alt="{{ primary.alt_text|default:item.product.name }}"
+                                         class="img-fluid rounded shadow-cwh pc-image"
+                                         style="height: 88px; width: 88px; object-fit: cover;">
+                                {% else %}
+                                    <div class="bg-light border rounded d-flex align-items-center justify-content-center"
+                                         style="height: 88px; width: 88px;">
+                                        <span class="small text-muted">No image</span>
+                                    </div>
+                                {% endif %}
+                            {% endwith %}
+                        </div>
+                        <div class="flex-grow-1 d-flex flex-column justify-content-between">
+                            <div>
+                                <h2 class="h6 mb-1">
+                                    <a href="{% url 'products:detail' item.product.slug %}">
+                                        {{ item.product.name }}
+                                    </a>
+                                </h2>
+                                <p class="mb-1">£{{ item.product.price|floatformat:2 }}</p>
+                                <p class="small text-muted mb-1">
+                                    Added {{ item.created_at|date:"Y-m-d" }}
+                                </p>
+                            </div>
+                            <div class="d-flex gap-2">
+                                <a href="{% url 'products:detail' item.product.slug %}"
+                                   class="btn btn-sm btn-cwh">
+                                    View
+                                </a>
+                                <form method="post" action="{% url 'products:wishlist_toggle' item.product.id %}">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">
+                                        Remove
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="alert alert-info">
+            Your wishlist is empty. Browse the <a href="{% url 'products:list' %}">shop</a> and use
+            the <strong>Add to Wishlist</strong> button on products you like.
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
