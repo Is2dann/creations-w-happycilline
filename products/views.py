@@ -196,15 +196,50 @@ def _is_staff_user(user):
 @user_passes_test(_is_staff_user)
 def admin_product_list(request):
     """
-    Admin-facing list of all products, with links to edit/delete.
+    Admin-facing list of all products, with search, filters,
+    thumbnail and links to edit/delete.
     """
     products = (
         Product.objects.all()
         .select_related('category')
-        .order_by('name')
+        .prefetch_related('images')
     )
+
+    # Search by name/description/SKU
+    q = (request.GET.get("q") or "").strip()
+    if q:
+        products = products.filter(
+            Q(name__icontains=q)
+            | Q(description__icontains=q)
+            | Q(sku__icontains=q)
+        )
+
+    # Filter by category (id)
+    raw_category = (request.GET.get("category") or "").strip()
+    category_id = None
+    if raw_category:
+        try:
+            category_id = int(raw_category)
+            products = products.filter(category_id=category_id)
+        except ValueError:
+            category_id = None
+
+    # Filter by active status
+    active_param = (request.GET.get("active") or "").strip()
+    if active_param == "1":
+        products = products.filter(is_active=True)
+    elif active_param == "0":
+        products = products.filter(is_active=False)
+
+    products = products.order_by("name")
+    categories = Category.objects.filter(is_active=True).order_by("name")
+
     return render(request, 'products/admin/product_admin_list.html', {
         'products': products,
+        'categories': categories,
+        'q': q,
+        'category_id': category_id,
+        'active_param': active_param,
     })
 
 
