@@ -177,5 +177,9 @@
 {% endblock %}
 
 {% block extra_js %}
+<script>
+  // Expose gallery data from Django context to JS
+  window.galleryData = {{ gallery_js|safe }};
+</script>
 <script src="{% static 'js/product_detail.js' %}"></script>
 {% endblock %}
